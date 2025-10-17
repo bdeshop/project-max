@@ -1,14 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import axios from "axios";
 import { TfiReload } from "react-icons/tfi";
 import { toast } from "react-toastify";
+import {
+  FaSearch,
+  FaCog,
+  FaUser,
+  FaLock,
+  FaExchangeAlt,
+  FaClock,
+} from "react-icons/fa";
+import { LuArrowUpDown } from "react-icons/lu";
+import { AuthContext } from "../../../context/AuthContext";
 
 const CreatedAdminList = () => {
   const { creatorId } = useParams();
   const [createdAdmins, setCreatedAdmins] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const adminsPerPage = 15;
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const {motherAdmin} = useContext(AuthContext)
 
   const fetchCreatedAdmins = async () => {
     try {
@@ -29,83 +42,300 @@ const CreatedAdminList = () => {
     fetchCreatedAdmins();
   }, [creatorId]);
 
+  // Pagination logic
+  const indexOfLastAdmin = currentPage * adminsPerPage;
+  const indexOfFirstAdmin = indexOfLastAdmin - adminsPerPage;
+  const currentAdmins = createdAdmins.slice(
+    indexOfFirstAdmin,
+    indexOfLastAdmin
+  );
+  const totalPages = Math.ceil(createdAdmins.length / adminsPerPage);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  // Calculate totals for current page
+  const totals = currentAdmins.reduce(
+    (acc, u) => {
+      acc.credit += u.credit || 0;
+      acc.balance += u.balance || 0;
+      acc.exposure += u.exposure || 0;
+      acc.availBal += u.availBal || 0;
+      acc.totalBal += u.totalBal || 0;
+      acc.playerBal += u.playerBal || 0;
+      acc.refPL += u.refPL || 0;
+      return acc;
+    },
+    {
+      credit: 0,
+      balance: 0,
+      exposure: 0,
+      availBal: 0,
+      totalBal: 0,
+      playerBal: 0,
+      refPL: 0,
+    }
+  );
+
+  const menuItems = [
+    { icon: <FaExchangeAlt />, label: "Betting Profit & Loss" },
+    { icon: <FaClock />, label: "Betting History" },
+    { icon: <FaUser />, label: "Profile" },
+    { icon: <FaCog />, label: "Change Status" },
+    { icon: <FaLock />, label: "Block Market" },
+  ];
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-800">
-          👥 Created Admins List
-        </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => navigate(-1)}
-            className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md cursor-pointer"
-          >
-            ← Back
-          </button>
+    <div className="p-4 bg-gray-100 min-h-screen">
+      {/* Header Section */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            placeholder="Find more member"
+            className="border border-gray-300 rounded px-2 py-1 w-64"
+          />
+          <FaSearch className="text-gray-600" />
+          <select className="border border-gray-300 rounded px-2 py-1 text-sm">
+            <option>ALL</option>
+            <option>ACTIVE</option>
+            <option>SUSPEND</option>
+            <option>LOCKED</option>
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
           <button
             onClick={fetchCreatedAdmins}
-            className="bg-yellow-50 border border-gray-200 px-4 py-2 rounded hover:bg-yellow-100 cursor-pointer"
+            className="py-2 px-4 rounded bg-yellow-50 border border-gray-200 cursor-pointer hover:bg-yellow-100"
           >
-            <TfiReload size={18} />
+            <TfiReload size={20} />
           </button>
         </div>
       </div>
 
-      {/* Table Section */}
-      <div className="bg-white rounded-lg shadow border">
-        {loading ? (
-          <div className="text-center py-10 text-gray-600">Loading...</div>
-        ) : createdAdmins.length === 0 ? (
-          <div className="text-center py-10 text-gray-500">
-            No sub-admins created yet.
-          </div>
-        ) : (
+      {/* Summary Section */}
+      <div className="flex bg-[#f5f6f8] border-b mb-5 overflow-hidden">
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Total Balance</p>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
+        </div>
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Net Exposure</p>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
+        </div>
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Balance</p>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
+        </div>
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Balance in Downline</p>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
+        </div>
+        <div className="flex-1 px-4 py-3">
+          <p className="text-gray-600 text-sm">Transferable P/L with Upline</p>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
+        </div>
+      </div>
+
+      {/* Conditional Rendering: Table or Empty Message */}
+      {loading ? (
+        <div className="text-center text-gray-600">Loading...</div>
+      ) : createdAdmins.length === 0 ? (
+        <div className="bg-white rounded shadow p-4 text-center text-lg text-red-600 font-semibold">
+          Please add user fast
+        </div>
+      ) : (
+        <div className="bg-white rounded shadow overflow-hidden">
           <table className="w-full border-collapse">
             <thead className="bg-[#1f3349] text-white">
               <tr>
-                <th className="p-3 text-left">Name</th>
-                <th className="p-3 text-left">Username</th>
-                <th className="p-3 text-left">Phone</th>
-                <th className="p-3 text-left">Timezone</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Created At</th>
+                <th className="p-2 text-left">Account</th>
+                <th className="p-2 text-right">Credit Ref.</th>
+                <th className="p-2 text-right">
+                  <span className="flex items-center justify-center">
+                    Balance <LuArrowUpDown />
+                  </span>
+                </th>
+                <th className="p-2 text-right">
+                  <span className="flex items-center justify-center">
+                    Exposure <LuArrowUpDown />
+                  </span>
+                </th>
+                <th className="p-2 text-right">
+                  <span className="flex items-center justify-center">
+                    Avail. bal. <LuArrowUpDown />
+                  </span>
+                </th>
+                <th className="p-2 text-right">
+                  <span className="flex items-center justify-center">
+                    TotalBalance <LuArrowUpDown />
+                  </span>
+                </th>
+                <th className="p-2 text-right">
+                  <span className="flex items-center justify-center">
+                    Player Balance <LuArrowUpDown />
+                  </span>
+                </th>
+                <th className="p-2 text-right">
+                  <span className="flex items-center justify-center">
+                    Ref. P/L <LuArrowUpDown />
+                  </span>
+                </th>
+                <th className="p-2 text-center">
+                  <span className="flex items-center justify-center">
+                    Status <LuArrowUpDown />
+                  </span>
+                </th>
+                <th className="p-2 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
-              {createdAdmins.map((admin, i) => (
+              {currentAdmins.map((u, i) => (
                 <tr
-                  key={admin._id}
-                  className={`border-b ${
+                  key={u._id}
+                  className={`border-b text-sm ${
                     i % 2 === 0 ? "bg-white" : "bg-gray-50"
                   }`}
                 >
-                  <td className="p-3">
-                    {admin.firstName} {admin.lastName}
-                  </td>
-                  <td className="p-3">{admin.username}</td>
-                  <td className="p-3">{admin.phone}</td>
-                  <td className="p-3">{admin.timeZone}</td>
-                  <td className="p-3">
+                  <td className="p-2 flex items-center space-x-1">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                        admin.status === "Activated"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
+                      onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)}
+                      className={`
+                        font-bold text-xs px-2 py-1 rounded-[4px] cursor-pointer transition
+                        ${
+                          u.role === "MA"
+                            ? "bg-purple-200 text-purple-800 hover:bg-purple-300"
+                            : u.role === "SA"
+                            ? "bg-blue-200 text-blue-800 hover:bg-blue-300"
+                            : u.role === "MT"
+                            ? "bg-green-200 text-green-800 hover:bg-green-300"
+                            : u.role === "AG"
+                            ? "bg-yellow-200 text-yellow-800 hover:bg-yellow-300"
+                            : u.role === "SG"
+                            ? "bg-pink-200 text-pink-800 hover:bg-pink-300"
+                            : u.role === "US"
+                            ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            : "bg-slate-200 text-slate-800 hover:bg-slate-300"
+                        }
+                      `}
                     >
-                      {admin.status}
+                      {u.role}
+                    </span>
+                    <span className="text-blue-600 font-bold underline cursor-pointer hover:no-underline">
+                      {u.firstName} {u.lastName}
                     </span>
                   </td>
-                  <td className="p-3 text-sm text-gray-500">
-                    {new Date(admin.createdAt).toLocaleString()}
+                  <td className="p-2 text-center">{u.credit?.toLocaleString()}</td>
+                  <td className="p-2 text-center">
+                    {u.balance?.toLocaleString()}
+                  </td>
+                  <td className="p-2 text-center text-red-600">
+                    {u.exposure?.toLocaleString()}
+                  </td>
+                  <td className="p-2 text-center">
+                    {u.availBal?.toLocaleString()}
+                  </td>
+                  <td className="p-2 text-center">
+                    {u.totalBal?.toLocaleString()}
+                  </td>
+                  <td className="p-2 text-center">
+                    {u.playerBal?.toLocaleString()}
+                  </td>
+                  <td className="p-2 text-center text-red-600">
+                    {u.refPL?.toLocaleString()}
+                  </td>
+                  <td className="p-2 text-center">
+                    <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold">
+                      ● {u.status}
+                    </span>
+                  </td>
+                  <td className="p-2 text-center">
+                    <div className="flex justify-center space-x-2">
+                      <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
+                        <FaCog size={16} />
+                      </button>
+                      <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
+                        <FaUser size={16} />
+                      </button>
+                      <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
+                        <FaLock size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
+
+              {/* Totals Row */}
+              <tr className="bg-[#FFEDD5] border-t font-semibold">
+                <td className="p-2">Total (Page {currentPage})</td>
+                <td className="p-2 text-center">
+                  {totals.credit.toLocaleString()}
+                </td>
+                <td className="p-2 text-center">
+                  {totals.balance.toLocaleString()}
+                </td>
+                <td className="p-2 text-center text-red-600">
+                  {totals.exposure.toLocaleString()}
+                </td>
+                <td className="p-2 text-center">
+                  {totals.availBal.toLocaleString()}
+                </td>
+                <td className="p-2 text-center">
+                  {totals.totalBal.toLocaleString()}
+                </td>
+                <td className="p-2 text-center">
+                  {totals.playerBal.toLocaleString()}
+                </td>
+                <td className="p-2 text-center text-red-600">
+                  {totals.refPL.toLocaleString()}
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
-        )}
-      </div>
+
+          {/* Pagination */}
+          <div className="flex items-center justify-center p-3 border-t border-b border-dashed text-sm mt-4">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className="border border-gray-200 px-2 py-1 rounded hover:bg-[#DBEAFE] cursor-pointer disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span className="px-3 rounded text-black py-1 bg-[#DBEAFE]">
+              {currentPage}
+            </span>
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className="border border-gray-200 px-2 py-1 rounded hover:bg-[#DBEAFE] cursor-pointer disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+
+          {/* Bottom Menu */}
+          <div className="flex flex-wrap justify-end mr-8 items-center gap-3 py-2 bg-white border-t border-gray-300">
+            {menuItems.map((item, index) => (
+              <React.Fragment key={index}>
+                <div className="flex items-center gap-2 bg-[#fff8e1] hover:bg-[#fef3c7] transition-colors border border-gray-200 px-3 py-2 rounded-md cursor-pointer">
+                  <span className="text-black">{item.icon}</span>
+                </div>
+                <span className="text-sm text-gray-800 whitespace-nowrap">
+                  {item.label}
+                </span>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

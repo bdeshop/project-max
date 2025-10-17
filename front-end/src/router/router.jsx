@@ -13,9 +13,6 @@ import Agent from "../pages/Agent/Agent";
 import AccountStatement from "../pages/AccountStatement/AccountStatement";
 import ActiveLog from "../pages/ActiveLog/ActiveLog";
 import LiveBet from "../pages/LiveBet/LiveBet";
-import BlockMarket from "../pages/BlockMarket/BlockMarket";
-import B2CAgentList from "../pages/B2CAgentList/B2CAgentList";
-import SearchUsers from "../pages/SearchUsers/SearchUsers";
 import ProfitLossReportByDownLine from "../pages/Reports/ProfitLossReportByDownLine";
 import ProfitLossReportByParlayDownLine from "../pages/Reports/ProfitLossReportByParlayDownLine";
 import SummaryProfitLossReport from "../pages/Reports/SummaryProfitLossReport";
@@ -35,53 +32,44 @@ import Ticker from "../pages/Managements/Ticker";
 import PopTicker from "../pages/Managements/PopTicker";
 import Social from "../pages/Managements/Social";
 import UploadBanner from "../pages/Managements/UploadBanner";
-import PBets from "../pages/Managements/CasinoControls/PBets";
-import AWCCasinoBets from "../pages/Managements/CasinoControls/AWCCasinoBets";
-import BOCasinoBets from "../pages/Managements/CasinoControls/BOCasinoBets";
-import BetGamesBets from "../pages/Managements/CasinoControls/BetGamesBets";
-import AWCCasinoProducts from "../pages/Managements/CasinoControls/AWCCasinoProducts";
 import MotherAdminRoute from "../routes/MotherAdminRoute";
 import MotherAdminLogin from "../pages/Logins/MotherAdminLogin/MotherAdminLogin";
 import CreatedAdminList from "../pages/AllAdminList/CreatedAdminList/CreatedAdminList";
+import Users from "../pages/Users/User";
+import SubAdminPrivetRoute from "../routes/SubAdminPrivetRoute";
+import SubAdminLogin from "../pages/Logins/SubAdminLogin/SubAdminLogin";
+import MasterLogin from "../pages/Logins/MasterLogin/MasterLogin";
+import MasterPrivetRoute from "../routes/MasterPrivetRoute";
+import AgentLogin from "../pages/Logins/AgentLogin/AgentLogin";
+import AgentPrivetRoute from "../routes/AgentPrivetRoute";
+import SubAgentPrivetRoute from "../routes/SubAgentPrivetRoute";
+import SubAgentLogin from "../pages/Logins/SubAgentLogin/SubAgentLogin";
 
 export const routes = createBrowserRouter([
   {
-    path: "/",
-    element: <RootLayout />,
+    path: "/ma",
+    element: (
+      <MotherAdminRoute>
+        {" "}
+        <RootLayout />{" "}
+      </MotherAdminRoute>
+    ),
     children: [
       {
         index: true,
-        element: (
-          <MotherAdminRoute>
-            <Home></Home>
-          </MotherAdminRoute>
-        ),
+        element: <Home></Home>,
       },
       {
         path: "account-summary",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <AccountSummary />{" "}
-          </MotherAdminRoute>
-        ),
+        element: <AccountSummary />,
       },
       {
         path: "banking",
-        element: (
-          <MotherAdminRoute>
-            <Banking />{" "}
-          </MotherAdminRoute>
-        ),
+        element: <Banking />,
       },
       {
         path: "master",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <Master></Master>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <Master></Master>,
       },
       {
         path: "mother-admin",
@@ -92,307 +80,125 @@ export const routes = createBrowserRouter([
         ),
       },
       {
-        path: "/created-admins/:creatorId",
-        element: (
-          <MotherAdminRoute>
-            <CreatedAdminList></CreatedAdminList>
-          </MotherAdminRoute>
-        ),
+        path: "created-admins/:creatorId",
+        element: <CreatedAdminList></CreatedAdminList>,
       },
       {
         path: "sub-admin",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <SubAdmin></SubAdmin>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <SubAdmin></SubAdmin>,
       },
       {
         path: "agent",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <Agent></Agent>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <Agent></Agent>,
       },
       {
         path: "bet-list",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <BetList></BetList>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <BetList></BetList>,
       },
       {
         path: "sub-agent",
-        element: (
-          <MotherAdminRoute>
-            <SubAgent></SubAgent>
-          </MotherAdminRoute>
-        ),
+        element: <SubAgent></SubAgent>,
+      },
+      {
+        path: "users",
+        element: <Users></Users>,
       },
       {
         path: "profile",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <Profile></Profile>
-          </MotherAdminRoute>
-        ),
+        element: <Profile></Profile>,
       },
       {
         path: "account-statement",
-        element: (
-          <MotherAdminRoute>
-            <AccountStatement></AccountStatement>
-          </MotherAdminRoute>
-        ),
+        element: <AccountStatement></AccountStatement>,
       },
       {
         path: "active-log",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <ActiveLog></ActiveLog>
-          </MotherAdminRoute>
-        ),
+        element: <ActiveLog></ActiveLog>,
       },
       {
         path: "live-bet",
-        element: (
-          <MotherAdminRoute>
-            <LiveBet></LiveBet>
-          </MotherAdminRoute>
-        ),
+        element: <LiveBet></LiveBet>,
       },
-      {
-        path: "block-market",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <BlockMarket></BlockMarket>
-          </MotherAdminRoute>
-        ),
-      },
-      {
-        path: "b2c-agent-list",
-        element: (
-          <MotherAdminRoute>
-            <B2CAgentList></B2CAgentList>
-          </MotherAdminRoute>
-        ),
-      },
-      {
-        path: "search-users",
-        element: (
-          <MotherAdminRoute>
-            <SearchUsers></SearchUsers>
-          </MotherAdminRoute>
-        ),
-      },
+
       {
         path: "my-report-pnl-downline",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <ProfitLossReportByDownLine></ProfitLossReportByDownLine>
-          </MotherAdminRoute>
-        ),
+        element: <ProfitLossReportByDownLine></ProfitLossReportByDownLine>,
       },
       {
         path: "my-report-parlay-downline",
         element: (
-          <MotherAdminRoute>
-            {" "}
-            <ProfitLossReportByParlayDownLine></ProfitLossReportByParlayDownLine>{" "}
-          </MotherAdminRoute>
+          <ProfitLossReportByParlayDownLine></ProfitLossReportByParlayDownLine>
         ),
       },
       {
         path: "my-report-summary-pnl",
-        element: (
-          <MotherAdminRoute>
-            <SummaryProfitLossReport></SummaryProfitLossReport>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <SummaryProfitLossReport></SummaryProfitLossReport>,
       },
       {
         path: "my-report-pl-market",
-        element: (
-          <MotherAdminRoute>
-            <ProfitLossReportByMarket></ProfitLossReportByMarket>
-          </MotherAdminRoute>
-        ),
+        element: <ProfitLossReportByMarket></ProfitLossReportByMarket>,
       },
       {
         path: "my-report-pl-player",
-        element: (
-          <MotherAdminRoute>
-            <ProfitLossReportByPlayer></ProfitLossReportByPlayer>
-          </MotherAdminRoute>
-        ),
+        element: <ProfitLossReportByPlayer></ProfitLossReportByPlayer>,
       },
       {
         path: "my-report-pl-casino",
-        element: (
-          <MotherAdminRoute>
-            <ProfitLossReportByAllCasino></ProfitLossReportByAllCasino>
-          </MotherAdminRoute>
-        ),
+        element: <ProfitLossReportByAllCasino></ProfitLossReportByAllCasino>,
       },
       {
         path: "my-report-pnl-casino-downline",
         element: (
-          <MotherAdminRoute>
-            {" "}
-            <ProfitLossReportByCasinoDownLine></ProfitLossReportByCasinoDownLine>
-          </MotherAdminRoute>
+          <ProfitLossReportByCasinoDownLine></ProfitLossReportByCasinoDownLine>
         ),
       },
       {
         path: "my-report-spin",
-        element: (
-          <MotherAdminRoute>
-            <SpinHistory></SpinHistory>
-          </MotherAdminRoute>
-        ),
+        element: <SpinHistory></SpinHistory>,
       },
       {
         path: "my-report-spinList",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <PendingSpinUsers></PendingSpinUsers>
-          </MotherAdminRoute>
-        ),
+        element: <PendingSpinUsers></PendingSpinUsers>,
       },
       {
         path: "my-report-PlAgentRef",
-        element: (
-          <MotherAdminRoute>
-            <UserRefCommisionReport></UserRefCommisionReport>
-          </MotherAdminRoute>
-        ),
+        element: <UserRefCommisionReport></UserRefCommisionReport>,
       },
       {
         path: "my-report-user-referral-list",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <UserReferralList></UserReferralList>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <UserReferralList></UserReferralList>,
       },
       {
         path: "risk-management",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <RiskManagement></RiskManagement>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <RiskManagement></RiskManagement>,
       },
       {
         path: "mm",
-        element: (
-          <MotherAdminRoute>
-            <MM></MM>{" "}
-          </MotherAdminRoute>
-        ),
+        element: <MM></MM>,
       },
       {
         path: "settings",
-        element: (
-          <MotherAdminRoute>
-            <Settings></Settings>
-          </MotherAdminRoute>
-        ),
+        element: <Settings></Settings>,
       },
       {
         path: "p-settings",
-        element: (
-          <MotherAdminRoute>
-            <PSettings></PSettings>
-          </MotherAdminRoute>
-        ),
+        element: <PSettings></PSettings>,
       },
       {
         path: "ticker",
-        element: (
-          <MotherAdminRoute>
-            <Ticker></Ticker>
-          </MotherAdminRoute>
-        ),
+        element: <Ticker></Ticker>,
       },
       {
         path: "pop-ticker",
-        element: (
-          <MotherAdminRoute>
-            <PopTicker></PopTicker>
-          </MotherAdminRoute>
-        ),
+        element: <PopTicker></PopTicker>,
       },
       {
         path: "social",
-        element: (
-          <MotherAdminRoute>
-            <Social></Social>
-          </MotherAdminRoute>
-        ),
+        element: <Social></Social>,
       },
       {
         path: "upload-banner",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <UploadBanner></UploadBanner>
-          </MotherAdminRoute>
-        ),
-      },
-      {
-        path: "p-bets",
-        element: (
-          <MotherAdminRoute>
-            <PBets></PBets>
-          </MotherAdminRoute>
-        ),
-      },
-      {
-        path: "awc-casino-bets",
-        element: (
-          <MotherAdminRoute>
-            <AWCCasinoBets></AWCCasinoBets>
-          </MotherAdminRoute>
-        ),
-      },
-      {
-        path: "bo-casino-bets",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <BOCasinoBets></BOCasinoBets>
-          </MotherAdminRoute>
-        ),
-      },
-      {
-        path: "bet-games-bets",
-        element: (
-          <MotherAdminRoute>
-            <BetGamesBets></BetGamesBets>
-          </MotherAdminRoute>
-        ),
-      },
-      {
-        path: "awc-casino-products",
-        element: (
-          <MotherAdminRoute>
-            {" "}
-            <AWCCasinoProducts></AWCCasinoProducts>
-          </MotherAdminRoute>
-        ),
+        element: <UploadBanner></UploadBanner>,
       },
     ],
   },
@@ -400,5 +206,592 @@ export const routes = createBrowserRouter([
     path: "ad-login",
     element: <MotherAdminLogin></MotherAdminLogin>,
   },
-  
+  {
+    path: "sa-login",
+    element: <SubAdminLogin></SubAdminLogin>,
+  },
+  {
+    path: "mt-login",
+    element: <MasterLogin></MasterLogin>,
+  },
+  {
+    path: "ag-login",
+    element: <AgentLogin></AgentLogin>,
+  },
+  {
+    path: "sg-login",
+    element: <SubAgentLogin></SubAgentLogin>,
+  },
+  {
+    path: "/sa",
+    element: (
+      <SubAdminPrivetRoute>
+        {" "}
+        <RootLayout />{" "}
+      </SubAdminPrivetRoute>
+    ),
+    children: [
+      {
+        path: "sub-admin",
+        element: (
+          <SubAdminPrivetRoute>
+            <SubAdmin></SubAdmin>
+          </SubAdminPrivetRoute>
+        ),
+      },
+      {
+        path: "account-summary",
+        element: <AccountSummary />,
+      },
+      {
+        path: "banking",
+        element: <Banking />,
+      },
+      {
+        path: "master",
+        element: <Master></Master>,
+      },
+      {
+        path: "created-admins/:creatorId",
+        element: <CreatedAdminList></CreatedAdminList>,
+      },
+      {
+        path: "agent",
+        element: <Agent></Agent>,
+      },
+      {
+        path: "bet-list",
+        element: <BetList></BetList>,
+      },
+      {
+        path: "sub-agent",
+        element: <SubAgent></SubAgent>,
+      },
+      {
+        path: "users",
+        element: <Users></Users>,
+      },
+      {
+        path: "profile",
+        element: <Profile></Profile>,
+      },
+      {
+        path: "account-statement",
+        element: <AccountStatement></AccountStatement>,
+      },
+      {
+        path: "active-log",
+        element: <ActiveLog></ActiveLog>,
+      },
+      {
+        path: "live-bet",
+        element: <LiveBet></LiveBet>,
+      },
+
+      {
+        path: "my-report-pnl-downline",
+        element: <ProfitLossReportByDownLine></ProfitLossReportByDownLine>,
+      },
+      {
+        path: "my-report-parlay-downline",
+        element: (
+          <ProfitLossReportByParlayDownLine></ProfitLossReportByParlayDownLine>
+        ),
+      },
+      {
+        path: "my-report-summary-pnl",
+        element: <SummaryProfitLossReport></SummaryProfitLossReport>,
+      },
+      {
+        path: "my-report-pl-market",
+        element: <ProfitLossReportByMarket></ProfitLossReportByMarket>,
+      },
+      {
+        path: "my-report-pl-player",
+        element: <ProfitLossReportByPlayer></ProfitLossReportByPlayer>,
+      },
+      {
+        path: "my-report-pl-casino",
+        element: <ProfitLossReportByAllCasino></ProfitLossReportByAllCasino>,
+      },
+      {
+        path: "my-report-pnl-casino-downline",
+        element: (
+          <ProfitLossReportByCasinoDownLine></ProfitLossReportByCasinoDownLine>
+        ),
+      },
+      {
+        path: "my-report-spin",
+        element: <SpinHistory></SpinHistory>,
+      },
+      {
+        path: "my-report-spinList",
+        element: <PendingSpinUsers></PendingSpinUsers>,
+      },
+      {
+        path: "my-report-PlAgentRef",
+        element: <UserRefCommisionReport></UserRefCommisionReport>,
+      },
+      {
+        path: "my-report-user-referral-list",
+        element: <UserReferralList></UserReferralList>,
+      },
+      {
+        path: "risk-management",
+        element: <RiskManagement></RiskManagement>,
+      },
+      {
+        path: "mm",
+        element: <MM></MM>,
+      },
+      {
+        path: "settings",
+        element: <Settings></Settings>,
+      },
+      {
+        path: "p-settings",
+        element: <PSettings></PSettings>,
+      },
+      {
+        path: "ticker",
+        element: <Ticker></Ticker>,
+      },
+      {
+        path: "pop-ticker",
+        element: <PopTicker></PopTicker>,
+      },
+      {
+        path: "social",
+        element: <Social></Social>,
+      },
+      {
+        path: "upload-banner",
+        element: <UploadBanner></UploadBanner>,
+      },
+    ],
+  },
+  {
+    path: "/mt",
+    element: (
+      <MasterPrivetRoute>
+        {" "}
+        <RootLayout />{" "}
+      </MasterPrivetRoute>
+    ),
+    children: [
+      {
+        path: "master",
+        element: (
+          <MasterPrivetRoute>
+            <Master></Master>
+          </MasterPrivetRoute>
+        ),
+      },
+      {
+        path: "account-summary",
+        element: <AccountSummary />,
+      },
+      {
+        path: "banking",
+        element: <Banking />,
+      },
+
+      {
+        path: "created-admins/:creatorId",
+        element: <CreatedAdminList></CreatedAdminList>,
+      },
+      {
+        path: "agent",
+        element: <Agent></Agent>,
+      },
+      {
+        path: "bet-list",
+        element: <BetList></BetList>,
+      },
+      {
+        path: "sub-agent",
+        element: <SubAgent></SubAgent>,
+      },
+      {
+        path: "users",
+        element: <Users></Users>,
+      },
+      {
+        path: "profile",
+        element: <Profile></Profile>,
+      },
+      {
+        path: "account-statement",
+        element: <AccountStatement></AccountStatement>,
+      },
+      {
+        path: "active-log",
+        element: <ActiveLog></ActiveLog>,
+      },
+      {
+        path: "live-bet",
+        element: <LiveBet></LiveBet>,
+      },
+
+      {
+        path: "my-report-pnl-downline",
+        element: <ProfitLossReportByDownLine></ProfitLossReportByDownLine>,
+      },
+      {
+        path: "my-report-parlay-downline",
+        element: (
+          <ProfitLossReportByParlayDownLine></ProfitLossReportByParlayDownLine>
+        ),
+      },
+      {
+        path: "my-report-summary-pnl",
+        element: <SummaryProfitLossReport></SummaryProfitLossReport>,
+      },
+      {
+        path: "my-report-pl-market",
+        element: <ProfitLossReportByMarket></ProfitLossReportByMarket>,
+      },
+      {
+        path: "my-report-pl-player",
+        element: <ProfitLossReportByPlayer></ProfitLossReportByPlayer>,
+      },
+      {
+        path: "my-report-pl-casino",
+        element: <ProfitLossReportByAllCasino></ProfitLossReportByAllCasino>,
+      },
+      {
+        path: "my-report-pnl-casino-downline",
+        element: (
+          <ProfitLossReportByCasinoDownLine></ProfitLossReportByCasinoDownLine>
+        ),
+      },
+      {
+        path: "my-report-spin",
+        element: <SpinHistory></SpinHistory>,
+      },
+      {
+        path: "my-report-spinList",
+        element: <PendingSpinUsers></PendingSpinUsers>,
+      },
+      {
+        path: "my-report-PlAgentRef",
+        element: <UserRefCommisionReport></UserRefCommisionReport>,
+      },
+      {
+        path: "my-report-user-referral-list",
+        element: <UserReferralList></UserReferralList>,
+      },
+      {
+        path: "risk-management",
+        element: <RiskManagement></RiskManagement>,
+      },
+      {
+        path: "mm",
+        element: <MM></MM>,
+      },
+      {
+        path: "settings",
+        element: <Settings></Settings>,
+      },
+      {
+        path: "p-settings",
+        element: <PSettings></PSettings>,
+      },
+      {
+        path: "ticker",
+        element: <Ticker></Ticker>,
+      },
+      {
+        path: "pop-ticker",
+        element: <PopTicker></PopTicker>,
+      },
+      {
+        path: "social",
+        element: <Social></Social>,
+      },
+      {
+        path: "upload-banner",
+        element: <UploadBanner></UploadBanner>,
+      },
+    ],
+  },
+  {
+    path: "/ag",
+    element: (
+      <AgentPrivetRoute>
+        {" "}
+        <RootLayout />{" "}
+      </AgentPrivetRoute>
+    ),
+    children: [
+      {
+        path: "agent",
+        element: (
+          <AgentPrivetRoute>
+            <Agent></Agent>
+          </AgentPrivetRoute>
+        ),
+      },
+      {
+        path: "account-summary",
+        element: <AccountSummary />,
+      },
+      {
+        path: "banking",
+        element: <Banking />,
+      },
+
+      {
+        path: "created-admins/:creatorId",
+        element: <CreatedAdminList></CreatedAdminList>,
+      },
+      {
+        path: "bet-list",
+        element: <BetList></BetList>,
+      },
+      {
+        path: "sub-agent",
+        element: <SubAgent></SubAgent>,
+      },
+      {
+        path: "users",
+        element: <Users></Users>,
+      },
+      {
+        path: "profile",
+        element: <Profile></Profile>,
+      },
+      {
+        path: "account-statement",
+        element: <AccountStatement></AccountStatement>,
+      },
+      {
+        path: "active-log",
+        element: <ActiveLog></ActiveLog>,
+      },
+      {
+        path: "live-bet",
+        element: <LiveBet></LiveBet>,
+      },
+
+      {
+        path: "my-report-pnl-downline",
+        element: <ProfitLossReportByDownLine></ProfitLossReportByDownLine>,
+      },
+      {
+        path: "my-report-parlay-downline",
+        element: (
+          <ProfitLossReportByParlayDownLine></ProfitLossReportByParlayDownLine>
+        ),
+      },
+      {
+        path: "my-report-summary-pnl",
+        element: <SummaryProfitLossReport></SummaryProfitLossReport>,
+      },
+      {
+        path: "my-report-pl-market",
+        element: <ProfitLossReportByMarket></ProfitLossReportByMarket>,
+      },
+      {
+        path: "my-report-pl-player",
+        element: <ProfitLossReportByPlayer></ProfitLossReportByPlayer>,
+      },
+      {
+        path: "my-report-pl-casino",
+        element: <ProfitLossReportByAllCasino></ProfitLossReportByAllCasino>,
+      },
+      {
+        path: "my-report-pnl-casino-downline",
+        element: (
+          <ProfitLossReportByCasinoDownLine></ProfitLossReportByCasinoDownLine>
+        ),
+      },
+      {
+        path: "my-report-spin",
+        element: <SpinHistory></SpinHistory>,
+      },
+      {
+        path: "my-report-spinList",
+        element: <PendingSpinUsers></PendingSpinUsers>,
+      },
+      {
+        path: "my-report-PlAgentRef",
+        element: <UserRefCommisionReport></UserRefCommisionReport>,
+      },
+      {
+        path: "my-report-user-referral-list",
+        element: <UserReferralList></UserReferralList>,
+      },
+      {
+        path: "risk-management",
+        element: <RiskManagement></RiskManagement>,
+      },
+      {
+        path: "mm",
+        element: <MM></MM>,
+      },
+      {
+        path: "settings",
+        element: <Settings></Settings>,
+      },
+      {
+        path: "p-settings",
+        element: <PSettings></PSettings>,
+      },
+      {
+        path: "ticker",
+        element: <Ticker></Ticker>,
+      },
+      {
+        path: "pop-ticker",
+        element: <PopTicker></PopTicker>,
+      },
+      {
+        path: "social",
+        element: <Social></Social>,
+      },
+      {
+        path: "upload-banner",
+        element: <UploadBanner></UploadBanner>,
+      },
+    ],
+  },
+  {
+    path: "/sg",
+    element: (
+      <SubAgentPrivetRoute>
+        {" "}
+        <RootLayout />{" "}
+      </SubAgentPrivetRoute>
+    ),
+    children: [
+      {
+        path: "sub-agent",
+        element: (
+          <SubAgentPrivetRoute>
+            <SubAgent></SubAgent>
+          </SubAgentPrivetRoute>
+        ),
+      },
+      {
+        path: "account-summary",
+        element: <AccountSummary />,
+      },
+      {
+        path: "banking",
+        element: <Banking />,
+      },
+
+      {
+        path: "created-admins/:creatorId",
+        element: <CreatedAdminList></CreatedAdminList>,
+      },
+      {
+        path: "bet-list",
+        element: <BetList></BetList>,
+      },
+
+      {
+        path: "users",
+        element: <Users></Users>,
+      },
+      {
+        path: "profile",
+        element: <Profile></Profile>,
+      },
+      {
+        path: "account-statement",
+        element: <AccountStatement></AccountStatement>,
+      },
+      {
+        path: "active-log",
+        element: <ActiveLog></ActiveLog>,
+      },
+      {
+        path: "live-bet",
+        element: <LiveBet></LiveBet>,
+      },
+
+      {
+        path: "my-report-pnl-downline",
+        element: <ProfitLossReportByDownLine></ProfitLossReportByDownLine>,
+      },
+      {
+        path: "my-report-parlay-downline",
+        element: (
+          <ProfitLossReportByParlayDownLine></ProfitLossReportByParlayDownLine>
+        ),
+      },
+      {
+        path: "my-report-summary-pnl",
+        element: <SummaryProfitLossReport></SummaryProfitLossReport>,
+      },
+      {
+        path: "my-report-pl-market",
+        element: <ProfitLossReportByMarket></ProfitLossReportByMarket>,
+      },
+      {
+        path: "my-report-pl-player",
+        element: <ProfitLossReportByPlayer></ProfitLossReportByPlayer>,
+      },
+      {
+        path: "my-report-pl-casino",
+        element: <ProfitLossReportByAllCasino></ProfitLossReportByAllCasino>,
+      },
+      {
+        path: "my-report-pnl-casino-downline",
+        element: (
+          <ProfitLossReportByCasinoDownLine></ProfitLossReportByCasinoDownLine>
+        ),
+      },
+      {
+        path: "my-report-spin",
+        element: <SpinHistory></SpinHistory>,
+      },
+      {
+        path: "my-report-spinList",
+        element: <PendingSpinUsers></PendingSpinUsers>,
+      },
+      {
+        path: "my-report-PlAgentRef",
+        element: <UserRefCommisionReport></UserRefCommisionReport>,
+      },
+      {
+        path: "my-report-user-referral-list",
+        element: <UserReferralList></UserReferralList>,
+      },
+      {
+        path: "risk-management",
+        element: <RiskManagement></RiskManagement>,
+      },
+      {
+        path: "mm",
+        element: <MM></MM>,
+      },
+      {
+        path: "settings",
+        element: <Settings></Settings>,
+      },
+      {
+        path: "p-settings",
+        element: <PSettings></PSettings>,
+      },
+      {
+        path: "ticker",
+        element: <Ticker></Ticker>,
+      },
+      {
+        path: "pop-ticker",
+        element: <PopTicker></PopTicker>,
+      },
+      {
+        path: "social",
+        element: <Social></Social>,
+      },
+      {
+        path: "upload-banner",
+        element: <UploadBanner></UploadBanner>,
+      },
+    ],
+  },
 ]);

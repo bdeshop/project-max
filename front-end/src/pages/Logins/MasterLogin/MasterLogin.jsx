@@ -5,7 +5,7 @@ import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router";
 
-const MotherAdminLogin = () => {
+const MasterLogin = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [validationInput, setValidationInput] = useState("");
@@ -33,7 +33,7 @@ const MotherAdminLogin = () => {
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/admins/ad-login`,
+        `${import.meta.env.VITE_API_URL}/api/admins/mt-login`,
         { userName, password }
       );
 
@@ -44,8 +44,8 @@ const MotherAdminLogin = () => {
         login(data.user); // context + localStorage এ ইউজার সেভ
         toast.success("Login successful!");
 
-        if (data.user.role === "MA") {
-          navigate("/ma/mother-admin");
+        if (data.user.role === "MT") {
+          navigate("/mt/master");
         } else {
           toast.error("You do not have permission to access this page!");
           navigate("/restricted");
@@ -61,7 +61,7 @@ const MotherAdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-900 via-sky-900 to-gray-900">
+    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-indigo-900 via-blue-900 to-gray-900">
       <div className="flex flex-col md:flex-row bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden shadow-2xl w-[90%] max-w-4xl border border-gray-700">
         {/* Left Side */}
         <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-b from-sky-700 to-blue-900 p-8">
@@ -71,7 +71,7 @@ const MotherAdminLogin = () => {
             className="w-60 mb-6"
           />
           <h1 className="text-2xl font-bold text-white tracking-wide">
-            Mother Admin Portal
+            Master Portal
           </h1>
           <p className="text-gray-300 mt-2 text-center text-sm">
             Manage your clients and deposits securely.
@@ -81,7 +81,7 @@ const MotherAdminLogin = () => {
         {/* Right Side (Form) */}
         <div className="w-full md:w-1/2 p-8 flex flex-col justify-center bg-black/60">
           <h2 className="text-center text-white text-2xl font-semibold mb-6">
-            Mother Admin Login
+            Master Login
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -141,4 +141,4 @@ const MotherAdminLogin = () => {
   );
 };
 
-export default MotherAdminLogin;
+export default MasterLogin;

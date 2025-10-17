@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
 import {
   FaSearch,
   FaCog,
@@ -10,9 +11,18 @@ import {
 import { IoMdAdd } from "react-icons/io";
 import { LuArrowUpDown } from "react-icons/lu";
 import { TfiReload } from "react-icons/tfi";
+import { toast } from "react-toastify";
+import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router";
 
 const SubAgent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [subAgents, setSubAgents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const adminsPerPage = 15;
+
+  const { motherAdmin } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const timeZones = [
     "Asia/Dhaka",
@@ -38,40 +48,89 @@ const SubAgent = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Data:", formData);
-    alert("✅ Form submitted successfully!");
+  const fetchSubAgents = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/admins/created/${motherAdmin?._id}`
+      );
+      setSubAgents(res.data.filter((u) => u.role === "SG"));
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error("❌ Failed to load sub-agent data");
+    }
   };
 
-  const users = [
-    {
-      id: 1,
-      name: "lotusad",
-      role: "AD",
-      credit: "3,96,509.00",
-      balance: "15,775.16",
-      exposure: "-495.45",
-      availBal: "48,107.96",
-      totalBal: "63,883.12",
-      playerBal: "8,752.25",
-      refPL: "-3,32,130.43",
-      status: "Active",
+  useEffect(() => {
+    if (motherAdmin) {
+      fetchSubAgents();
+    }
+  }, [motherAdmin]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admins`,
+        {
+          ...formData,
+          role: "SG", // Explicitly set role to "SG" for sub-agents
+          createdBy: motherAdmin?._id || null,
+        }
+      );
+      if (res.data.success) {
+        toast.success("✅ Sub-agent added successfully!");
+        setIsModalOpen(false);
+        setFormData({
+          username: "",
+          password: "",
+          firstName: "",
+          lastName: "",
+          phone: "",
+          timeZone: "Asia/Dhaka",
+        });
+        fetchSubAgents();
+      }
+    } catch (error) {
+      console.error("Error adding sub-agent:", error);
+      toast.error("❌ Failed to add sub-agent");
+    }
+  };
+
+  // Pagination logic
+  const indexOfLastAdmin = currentPage * adminsPerPage;
+  const indexOfFirstAdmin = indexOfLastAdmin - adminsPerPage;
+  const currentSubAgents = subAgents.slice(indexOfFirstAdmin, indexOfLastAdmin);
+  const totalPages = Math.ceil(subAgents.length / adminsPerPage);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  // Calculate totals for current page
+  const totals = currentSubAgents.reduce(
+    (acc, u) => {
+      acc.credit += u.credit || 0;
+      acc.balance += u.balance || 0;
+      acc.exposure += u.exposure || 0;
+      acc.availBal += u.availBal || 0;
+      acc.totalBal += u.totalBal || 0;
+      acc.playerBal += u.playerBal || 0;
+      acc.refPL += u.refPL || 0;
+      return acc;
     },
     {
-      id: 2,
-      name: "ADenjoy247",
-      role: "AD",
-      credit: "6.43",
-      balance: "5.90",
-      exposure: "-0.00",
-      availBal: "0.00",
-      totalBal: "5.90",
-      playerBal: "5.90",
-      refPL: "-0.53",
-      status: "Active",
-    },
-  ];
+      credit: 0,
+      balance: 0,
+      exposure: 0,
+      availBal: 0,
+      totalBal: 0,
+      playerBal: 0,
+      refPL: 0,
+    }
+  );
 
   const menuItems = [
     { icon: <FaExchangeAlt />, label: "Betting Profit & Loss" },
@@ -108,7 +167,10 @@ const SubAgent = () => {
             <IoMdAdd />
             <span>Add Sub Agent</span>
           </button>
-          <button className="py-2 px-4 rounded bg-yellow-50 border border-gray-200 cursor-pointer hover:bg-yellow-100">
+          <button
+            onClick={fetchSubAgents}
+            className="py-2 px-4 rounded bg-yellow-50 border border-gray-200 cursor-pointer hover:bg-yellow-100"
+          >
             <TfiReload size={20} />
           </button>
         </div>
@@ -116,43 +178,22 @@ const SubAgent = () => {
 
       {/* Summary Section */}
       <div className="flex bg-[#f5f6f8] border-b mb-5 overflow-hidden">
-        {/* Total Balance */}
-        <div className="flex-1  px-4 py-3">
-          <div className="border-r">
-            <p className="text-gray-600 text-sm">Total Balance</p>
-            <h2 className="font-extrabold text-lg text-black">
-              PBU 3,96,500.00
-            </h2>
-          </div>
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Total Balance</p>
+          <h2 className="font-extrabold text-lg text-black">PBU 3,96,500.00</h2>
         </div>
-
-        {/* Net Exposure */}
-        <div className="flex-1 px-4 py-3">
-          <div className="border-r">
-            <p className="text-gray-600 text-sm">Net Exposure</p>
-            <h2 className="font-extrabold text-lg text-red-600">
-              PBU (610.17)
-            </h2>
-          </div>
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Net Exposure</p>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (610.17)</h2>
         </div>
-
-        {/* Balance */}
-        <div className="flex-1  px-4 py-3">
-          <div className="border-r">
-            <p className="text-gray-600 text-sm">Balance</p>
-            <h2 className="font-extrabold text-lg text-black">PBU 0.00</h2>
-          </div>
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Balance</p>
+          <h2 className="font-extrabold text-lg text-black">PBU 0.00</h2>
         </div>
-
-        {/* Balance in Downline */}
-        <div className="flex-1  px-4 py-3">
-          <div className="border-r">
-            <p className="text-gray-600 text-sm">Balance in Downline</p>
-            <h2 className="font-extrabold text-lg text-black">PBU 63,825.13</h2>
-          </div>
+        <div className="flex-1 px-4 py-3 border-r">
+          <p className="text-gray-600 text-sm">Balance in Downline</p>
+          <h2 className="font-extrabold text-lg text-black">PBU 63,825.13</h2>
         </div>
-
-        {/* Transferable P/L with Upline */}
         <div className="flex-1 px-4 py-3">
           <p className="text-gray-600 text-sm">Transferable P/L with Upline</p>
           <h2 className="font-extrabold text-lg text-red-600">
@@ -165,79 +206,87 @@ const SubAgent = () => {
       <div className="bg-white rounded shadow overflow-hidden">
         <table className="w-full border-collapse">
           <thead className="bg-[#1f3349] text-white">
-            <tr className="">
+            <tr>
               <th className="p-2 text-left">Account</th>
               <th className="p-2 text-right">Credit Ref.</th>
-              <th className="p-2 text-right  ">
+              <th className="p-2 text-right">
                 <span className="flex items-center justify-center">
-                  Balance
-                  <LuArrowUpDown />
+                  Balance <LuArrowUpDown />
                 </span>
               </th>
-              <th className="p-2 text-right  ">
+              <th className="p-2 text-right">
                 <span className="flex items-center justify-center">
-                  Exposure
-                  <LuArrowUpDown />
+                  Exposure <LuArrowUpDown />
                 </span>
               </th>
-              <th className="p-2 text-right  ">
+              <th className="p-2 text-right">
                 <span className="flex items-center justify-center">
-                  Avail. bal.
-                  <LuArrowUpDown />
+                  Avail. bal. <LuArrowUpDown />
                 </span>
               </th>
-              <th className="p-2 text-right  ">
+              <th className="p-2 text-right">
                 <span className="flex items-center justify-center">
-                  TotalBalance
-                  <LuArrowUpDown />
+                  TotalBalance <LuArrowUpDown />
                 </span>
               </th>
-              <th className="p-2 text-right  ">
+              <th className="p-2 text-right">
                 <span className="flex items-center justify-center">
-                  Player Balance
-                  <LuArrowUpDown />
+                  Player Balance <LuArrowUpDown />
                 </span>
               </th>
-              <th className="p-2 text-right  ">
+              <th className="p-2 text-right">
                 <span className="flex items-center justify-center">
-                  Ref. P/L
-                  <LuArrowUpDown />
+                  Ref. P/L <LuArrowUpDown />
                 </span>
               </th>
-              <th className="p-2 text-center ">
+              <th className="p-2 text-center">
                 <span className="flex items-center justify-center">
-                  Status
-                  <LuArrowUpDown />
+                  Status <LuArrowUpDown />
                 </span>
               </th>
               <th className="p-2 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((u, i) => (
+            {currentSubAgents.map((u, i) => (
               <tr
-                key={u.id}
+                key={u._id}
                 className={`border-b text-sm ${
                   i % 2 === 0 ? "bg-white" : "bg-gray-50"
                 }`}
               >
                 <td className="p-2 flex items-center space-x-1">
-                  <span className="bg-pink-200 text-pink-800 text-xs px-2 py-1 rounded-[4px]">
+                  <span
+                    onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)}
+                    className="bg-yellow-200 font-bold text-yellow-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-yellow-300 transition"
+                  >
                     {u.role}
                   </span>
-                  <span className="text-blue-600 underline cursor-pointer hover:no-underline ">
-                    {u.name}
+                  <span className="text-blue-600 font-bold underline cursor-pointer hover:no-underline">
+                    {u.firstName} {u.lastName}
                   </span>
                 </td>
-                <td className="p-2 text-right">{u.credit}</td>
-                <td className="p-2 text-right">{u.balance}</td>
-                <td className="p-2 text-right text-red-600">{u.exposure}</td>
-                <td className="p-2 text-right">{u.availBal}</td>
-                <td className="p-2 text-right">{u.totalBal}</td>
-                <td className="p-2 text-right">{u.playerBal}</td>
-                <td className="p-2 text-right text-red-600">{u.refPL}</td>
+                <td className="p-2 text-right">{u.credit?.toLocaleString()}</td>
+                <td className="p-2 text-right">
+                  {u.balance?.toLocaleString()}
+                </td>
+                <td className="p-2 text-right text-red-600">
+                  {u.exposure?.toLocaleString()}
+                </td>
+                <td className="p-2 text-right">
+                  {u.availBal?.toLocaleString()}
+                </td>
+                <td className="p-2 text-right">
+                  {u.totalBal?.toLocaleString()}
+                </td>
+                <td className="p-2 text-right">
+                  {u.playerBal?.toLocaleString()}
+                </td>
+                <td className="p-2 text-right text-red-600">
+                  {u.refPL?.toLocaleString()}
+                </td>
                 <td className="p-2 text-center">
-                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded text-xs">
+                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold">
                     ● {u.status}
                   </span>
                 </td>
@@ -256,15 +305,31 @@ const SubAgent = () => {
                 </td>
               </tr>
             ))}
-            <tr className="bg-[#FFEDD5] border-t">
-              <td className="p-2">Total</td>
-              <td className="p-2 text-right">3,96,515.43</td>
-              <td className="p-2 text-right">15,781.06</td>
-              <td className="p-2 text-right text-red-600">(495.45)</td>
-              <td className="p-2 text-right">48,107.96</td>
-              <td className="p-2 text-right">63,889.02</td>
-              <td className="p-2 text-right">8,758.15</td>
-              <td className="p-2 text-right text-red-600">(3,32,130.96)</td>
+
+            {/* Totals Row */}
+            <tr className="bg-[#FFEDD5] border-t font-semibold">
+              <td className="p-2">Total (Page {currentPage})</td>
+              <td className="p-2 text-right">
+                {totals.credit.toLocaleString()}
+              </td>
+              <td className="p-2 text-right">
+                {totals.balance.toLocaleString()}
+              </td>
+              <td className="p-2 text-right text-red-600">
+                {totals.exposure.toLocaleString()}
+              </td>
+              <td className="p-2 text-right">
+                {totals.availBal.toLocaleString()}
+              </td>
+              <td className="p-2 text-right">
+                {totals.totalBal.toLocaleString()}
+              </td>
+              <td className="p-2 text-right">
+                {totals.playerBal.toLocaleString()}
+              </td>
+              <td className="p-2 text-right text-red-600">
+                {totals.refPL.toLocaleString()}
+              </td>
               <td></td>
               <td></td>
             </tr>
@@ -273,48 +338,49 @@ const SubAgent = () => {
 
         {/* Pagination */}
         <div className="flex items-center justify-center p-3 border-t border-b border-dashed text-sm mt-4">
-          <button className="border border-gray-200 px-2 py-1 rounded hover:bg-[#DBEAFE] cursor-pointer">
+          <button
+            onClick={prevPage}
+            disabled={currentPage === 1}
+            className="border border-gray-200 px-2 py-1 rounded hover:bg-[#DBEAFE] cursor-pointer disabled:opacity-50"
+          >
             Prev
           </button>
-          <span className="px-3  rounded text-black py-1 bg-[#DBEAFE]">1</span>
-          <button className="border border-gray-200 px-2 py-1 rounded hover:bg-[#DBEAFE] cursor-pointer ">
+          <span className="px-3 rounded text-black py-1 bg-[#DBEAFE]">
+            {currentPage}
+          </span>
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+            className="border border-gray-200 px-2 py-1 rounded hover:bg-[#DBEAFE] cursor-pointer disabled:opacity-50"
+          >
             Next
           </button>
-          <input
-            type="number"
-            value="1"
-            className="border px-2 py-1 w-16 rounded ml-4 border-gray-200"
-          />
-          <button className="bg-red-500 text-white px-3 py-1 rounded ml-2">
-            GO
-          </button>
         </div>
+
+        {/* Bottom Menu */}
         <div className="flex flex-wrap justify-end mr-8 items-center gap-3 py-2 bg-white border-t border-gray-300">
           {menuItems.map((item, index) => (
-            <>
-              <div
-                key={index}
-                className="flex items-center gap-2 bg-[#fff8e1] hover:bg-[#fef3c7] transition-colors border border-gray-200 px-3 py-2 rounded-md cursor-pointer"
-              >
+            <React.Fragment key={index}>
+              <div className="flex items-center gap-2 bg-[#fff8e1] hover:bg-[#fef3c7] transition-colors border border-gray-200 px-3 py-2 rounded-md cursor-pointer">
                 <span className="text-black">{item.icon}</span>
               </div>
-
               <span className="text-sm text-gray-800 whitespace-nowrap">
                 {item.label}
               </span>
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>
-      {/* Add Admin Modal */}
+
+      {/* Add Sub Agent Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 rounded-xl">
-          <div className="bg-white shadow-lg w-1/2  rounded-2xl">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-xl">
+          <div className="bg-white shadow-lg w-1/2 rounded-2xl">
             <div className="bg-red-600 text-white p-2 flex justify-between items-center rounded-tl-xl rounded-tr-xl">
-              <h3 className="text-lg font-bold">Add admin</h3>
+              <h3 className="text-lg font-bold">Add Sub Agent</h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-white cursor-pointer hover:text-gray-200"
+                className="text-white hover:text-gray-200"
               >
                 ✕
               </button>
@@ -329,9 +395,7 @@ const SubAgent = () => {
                 className="max-w-4xl mx-auto bg-white p-8 rounded-lg"
                 onSubmit={handleSubmit}
               >
-                {/* Form Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-4 border-b border-gray-300 mb-36">
-                  {/* Left Column */}
                   <div>
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -343,9 +407,9 @@ const SubAgent = () => {
                         value={formData.username}
                         onChange={handleChange}
                         placeholder="Enter username"
-                        className="w-full  ml-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                        className="w-full ml-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
                         required
-                      />{" "}
+                      />
                       <span className="text-red-600">*</span>
                     </div>
 
@@ -361,7 +425,7 @@ const SubAgent = () => {
                         placeholder="Enter password"
                         className="w-full ml-2 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
                         required
-                      />{" "}
+                      />
                       <span className="text-red-600">*</span>
                     </div>
 
@@ -377,12 +441,11 @@ const SubAgent = () => {
                         placeholder="Enter first name"
                         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
                         required
-                      />{" "}
+                      />
                       <span className="text-red-600">*</span>
                     </div>
                   </div>
 
-                  {/* Right Column */}
                   <div>
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -396,7 +459,7 @@ const SubAgent = () => {
                         placeholder="Enter last name"
                         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
                         required
-                      />{" "}
+                      />
                       <span className="text-red-600">*</span>
                     </div>
 
@@ -412,11 +475,11 @@ const SubAgent = () => {
                         placeholder="Enter phone number"
                         className="w-full ml-[26px] border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
                         required
-                      />{" "}
+                      />
                       <span className="text-red-600">*</span>
                     </div>
 
-                    <div className="mb-4 mb-4 flex justify-center items-center gap-4 text-nowrap">
+                    <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         TimeZone
                       </label>
@@ -432,16 +495,12 @@ const SubAgent = () => {
                             {zone}
                           </option>
                         ))}
-                      </select>{" "}
+                      </select>
                       <span className="text-red-600">*</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Bottom Divider */}
-                <div className="border-b border-dashed mb-6"></div>
-
-                {/* Submit Button */}
                 <div className="flex justify-end">
                   <button
                     type="submit"

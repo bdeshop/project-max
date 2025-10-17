@@ -52,7 +52,7 @@ const MotherAdmin = () => {
   const fetchAdmins = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admins`);
-      setAdmins(res.data);
+      setAdmins(res.data.filter(u => u.role === "MA"));
     } catch (error) {
       console.error("Fetch error:", error);
       toast.error("❌ Failed to load admin data");
@@ -70,6 +70,7 @@ const MotherAdmin = () => {
         `${import.meta.env.VITE_API_URL}/api/admins`,
         {
           ...formData,
+          role: "MA", // Explicitly set role to "SA" for sub-admins
           createdBy: motherAdmin?._id || null,
         }
       );
@@ -176,24 +177,24 @@ const MotherAdmin = () => {
       <div className="flex bg-[#f5f6f8] border-b mb-5 overflow-hidden">
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Total Balance</p>
-          <h2 className="font-extrabold text-lg text-black">PBU 3,96,500.00</h2>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Net Exposure</p>
-          <h2 className="font-extrabold text-lg text-red-600">PBU (610.17)</h2>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Balance</p>
-          <h2 className="font-extrabold text-lg text-black">PBU 0.00</h2>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Balance in Downline</p>
-          <h2 className="font-extrabold text-lg text-black">PBU 63,825.13</h2>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
         </div>
         <div className="flex-1 px-4 py-3">
           <p className="text-gray-600 text-sm">Transferable P/L with Upline</p>
           <h2 className="font-extrabold text-lg text-red-600">
-            PBU (3,32,080.13)
+            PBU (00.00)
           </h2>
         </div>
       </div>
@@ -269,12 +270,12 @@ const MotherAdmin = () => {
               >
                 <td className="p-2 flex items-center space-x-1">
                   <span
-                    onClick={() => navigate(`/created-admins/${u._id}`)}
-                    className="bg-pink-200 text-pink-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-pink-300 transition"
+                    onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)}
+                    className="bg-blue-200 font-bold text-blue-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-blue-300 transition"
                   >
                     {u.role}
                   </span>
-                  <span className="text-blue-600 underline cursor-pointer hover:no-underline">
+                  <span className="text-blue-600 font-bold underline cursor-pointer hover:no-underline">
                     {u.firstName} {u.lastName}
                   </span>
                 </td>

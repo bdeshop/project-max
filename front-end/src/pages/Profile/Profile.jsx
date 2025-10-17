@@ -1,11 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { FaEdit, FaTimes } from "react-icons/fa";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { AuthContext } from "../../context/AuthContext";
 
 const Profile = () => {
+  const { motherAdmin, logout } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+    if (!currentPassword || !newPassword) {
+      toast.error("Please fill all fields!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admins/change-password`,
+        {
+          adminId: motherAdmin._id,
+          currentPassword,
+          newPassword,
+        }
+      );
+
+      toast.success(response.data.message);
+      handleCloseModal();
+      // logout(); // Logout after successful password change
+      // Optional: Redirect to login page (if using react-router-dom)
+      // import { useNavigate } from "react-router-dom";
+      // const navigate = useNavigate();
+      // navigate("/login");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to change password!");
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen ">
@@ -15,7 +59,7 @@ const Profile = () => {
           <span className="bg-black text-white px-3 py-1 rounded font-semibold">
             WL
           </span>
-          <h2 className="font-semibold text-lg">MPenjoy247</h2>
+          <h2 className="font-semibold text-lg">{motherAdmin.username}</h2>
         </div>
 
         <h3 className="text-lg font-semibold mb-3">Profile</h3>
@@ -31,7 +75,7 @@ const Profile = () => {
               <tbody>
                 <tr className="border-b">
                   <td className="p-2 font-medium w-1/3">Full Name</td>
-                  <td className="p-2">ImranKhan</td>
+                  <td className="p-2">{motherAdmin.username}</td>
                 </tr>
                 <tr className="border-b">
                   <td className="p-2 font-medium">Domain</td>
@@ -88,11 +132,13 @@ const Profile = () => {
 
             {/* Modal Body */}
             <div className="p-4">
-              <form className="space-y-3">
+              <form className="space-y-3" onSubmit={handlePasswordChange}>
                 <div>
                   <label className="text-sm font-medium">New Password</label>
                   <input
                     type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter"
                     className="w-full border px-2 py-1 mt-1 rounded outline-none"
                     required
@@ -104,6 +150,8 @@ const Profile = () => {
                   </label>
                   <input
                     type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Enter"
                     className="w-full border px-2 py-1 mt-1 rounded outline-none"
                     required
@@ -113,6 +161,8 @@ const Profile = () => {
                   <label className="text-sm font-medium">Your Password</label>
                   <input
                     type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter"
                     className="w-full border px-2 py-1 mt-1 rounded outline-none"
                     required
@@ -123,8 +173,9 @@ const Profile = () => {
                   <button
                     type="submit"
                     className="bg-red-600 cursor-pointer hover:bg-red-700 text-white font-semibold px-5 py-1 rounded"
+                    disabled={loading}
                   >
-                    Change
+                    {loading ? "Changing..." : "Change"}
                   </button>
                 </div>
               </form>

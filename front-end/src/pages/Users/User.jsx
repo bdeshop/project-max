@@ -15,11 +15,11 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router";
 
-const Master = () => {
+const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [masters, setMasters] = useState([]);
+  const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const adminsPerPage = 15;
+  const usersPerPage = 15;
 
   const { motherAdmin } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -48,21 +48,21 @@ const Master = () => {
     });
   };
 
-  const fetchMasters = async () => {
+  const fetchUsers = async () => {
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/admins/created/${motherAdmin?._id}`
       );
-      setMasters(res.data.filter(u => u.role === "MT"));
+      setUsers(res.data.filter((u) => u.role === "US"));
     } catch (error) {
       console.error("Fetch error:", error);
-      toast.error("❌ Failed to load master data");
+      toast.error("❌ Failed to load user data");
     }
   };
 
   useEffect(() => {
     if (motherAdmin) {
-      fetchMasters();
+      fetchUsers();
     }
   }, [motherAdmin]);
 
@@ -73,12 +73,12 @@ const Master = () => {
         `${import.meta.env.VITE_API_URL}/api/admins`,
         {
           ...formData,
-          role: "MT", // Explicitly set role to "MT" for masters
+          role: "US", // Explicitly set role to "US" for users
           createdBy: motherAdmin?._id || null,
         }
       );
       if (res.data.success) {
-        toast.success("✅ Master added successfully!");
+        toast.success("✅ User added successfully!");
         setIsModalOpen(false);
         setFormData({
           username: "",
@@ -88,19 +88,19 @@ const Master = () => {
           phone: "",
           timeZone: "Asia/Dhaka",
         });
-        fetchMasters();
+        fetchUsers();
       }
     } catch (error) {
-      console.error("Error adding master:", error);
-      toast.error("❌ Failed to add master");
+      console.error("Error adding user:", error);
+      toast.error("❌ Failed to add user");
     }
   };
 
   // Pagination logic
-  const indexOfLastAdmin = currentPage * adminsPerPage;
-  const indexOfFirstAdmin = indexOfLastAdmin - adminsPerPage;
-  const currentMasters = masters.slice(indexOfFirstAdmin, indexOfLastAdmin);
-  const totalPages = Math.ceil(masters.length / adminsPerPage);
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users.length / usersPerPage);
 
   const nextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -110,7 +110,7 @@ const Master = () => {
   };
 
   // Calculate totals for current page
-  const totals = currentMasters.reduce(
+  const totals = currentUsers.reduce(
     (acc, u) => {
       acc.credit += u.credit || 0;
       acc.balance += u.balance || 0;
@@ -165,10 +165,10 @@ const Master = () => {
             onClick={() => setIsModalOpen(true)}
           >
             <IoMdAdd />
-            <span>Add Master</span>
+            <span>Add User</span>
           </button>
           <button
-            onClick={fetchMasters}
+            onClick={fetchUsers}
             className="py-2 px-4 rounded bg-yellow-50 border border-gray-200 cursor-pointer hover:bg-yellow-100"
           >
             <TfiReload size={20} />
@@ -248,7 +248,7 @@ const Master = () => {
             </tr>
           </thead>
           <tbody>
-            {currentMasters.map((u, i) => (
+            {currentUsers.map((u, i) => (
               <tr
                 key={u._id}
                 className={`border-b text-sm ${
@@ -257,8 +257,8 @@ const Master = () => {
               >
                 <td className="p-2 flex items-center space-x-1">
                   <span
-                    onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)} // Assuming same route for masters' details
-                    className="bg-pink-200 font-bold text-pink-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-pink-300 transition"
+                    onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)}
+                    className="bg-red-200 font-bold text-red-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-red-300 transition"
                   >
                     {u.role}
                   </span>
@@ -286,7 +286,7 @@ const Master = () => {
                   {u.refPL?.toLocaleString()}
                 </td>
                 <td className="p-2 text-center">
-                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold ">
+                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold">
                     ● {u.status}
                   </span>
                 </td>
@@ -372,12 +372,12 @@ const Master = () => {
         </div>
       </div>
 
-      {/* Add Master Modal */}
+      {/* Add User Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-xl">
           <div className="bg-white shadow-lg w-1/2 rounded-2xl">
             <div className="bg-red-600 text-white p-2 flex justify-between items-center rounded-tl-xl rounded-tr-xl">
-              <h3 className="text-lg font-bold">Add Master</h3>
+              <h3 className="text-lg font-bold">Add User</h3>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-white hover:text-gray-200"
@@ -518,4 +518,4 @@ const Master = () => {
   );
 };
 
-export default Master;
+export default Users;

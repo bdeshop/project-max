@@ -1,9 +1,6 @@
-import React, { useContext, useState } from "react";
-import { NavLink, Outlet } from "react-router";
-import {
-  FaChevronDown,
-  FaMicrophone,
-} from "react-icons/fa";
+import React, { useContext, useState, useMemo } from "react";
+import { NavLink, Outlet, useLocation } from "react-router";
+import { FaChevronDown, FaMicrophone } from "react-icons/fa";
 import { TfiReload } from "react-icons/tfi";
 import { TbLogout } from "react-icons/tb";
 import { AuthContext } from "../../context/AuthContext";
@@ -12,83 +9,159 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [activeSubDropdown, setActiveSubDropdown] = useState(null);
-  const {motherAdmin,loading} = useContext(AuthContext)
+  const { motherAdmin, logout,balance } = useContext(AuthContext);
+  const location = useLocation(); // To get the current route
 
   const handleDropdown = (menu) => {
     setActiveDropdown(activeDropdown === menu ? null : menu);
-    setActiveSubDropdown(null); // close sub when parent toggled
+    setActiveSubDropdown(null);
   };
 
   const handleSubDropdown = (submenu) => {
     setActiveSubDropdown(activeSubDropdown === submenu ? null : submenu);
   };
 
+  // Conditionally define Downline dropdown based on role
+  let downlineDropdown = [];
+  if (motherAdmin?.role === "MA") {
+    downlineDropdown = [
+      { name: "Mother Admin", path: `/${"ma"}/mother-admin` },
+      { name: "Sub Admin", path: `/${"ma"}/sub-admin` },
+      { name: "Master", path: `/${"ma"}/master` },
+      { name: "Agent", path: `/${"ma"}/agent` },
+      { name: "Sub Agent", path: `/${"ma"}/sub-agent` },
+      { name: "User", path: `/${"ma"}/users` },
+    ];
+  } else if (motherAdmin?.role === "SA") {
+    downlineDropdown = [
+      { name: "Sub Admin", path: `/${"sa"}/sub-admin` },
+      { name: "Master", path: `/${"sa"}/master` },
+      { name: "Agent", path: `/${"sa"}/agent` },
+      { name: "Sub Agent", path: `/${"sa"}/sub-agent` },
+      { name: "User", path: `/${"sa"}/users` },
+    ];
+  } else if (motherAdmin?.role === "MT") {
+    downlineDropdown = [
+      { name: "Master", path: `/${"mt"}/master` },
+      { name: "Agent", path: `/${"mt"}/agent` },
+      { name: "Sub Agent", path: `/${"mt"}/sub-agent` },
+      { name: "User", path: `/${"mt"}/users` },
+    ];
+  } else if (motherAdmin?.role === "AG") {
+    downlineDropdown = [
+      { name: "Agent", path: `/${"ag"}/agent` },
+      { name: "Sub Agent", path: `/${"ag"}/sub-agent` },
+      { name: "User", path: `/${"ag"}/users` },
+    ];
+  } else if (motherAdmin?.role === "SG") {
+    downlineDropdown = [
+      { name: "Sub Agent", path: `/${"sg"}/sub-agent` },
+      { name: "User", path: `/${"sg"}/users` },
+    ];
+  } else if (motherAdmin?.role === "US") {
+    downlineDropdown = [{ name: "User", path: `/${"us"}/users` }];
+  }
+
+  // Full navItems with conditional Downline
   const navItems = [
     {
       name: "Downline",
-      dropdown: [
-        { name: "Mother Admin", path: "/mother-admin" },
-        { name: "Sub Admin", path: "/sub-admin" },
-        { name: "Master", path: "/master" },
-        { name: "Agent", path: "/agent" },
-        { name: "Sub Agent", path: "/sub-agent" },
-      ],
+      dropdown: downlineDropdown,
     },
     {
       name: "My Account",
       dropdown: [
-        { name: "Account Statement", path: "/account-statement" },
-        { name: "Account Summary", path: "/account-summary" },
-        { name: "Profile", path: "/profile" },
-        { name: "Active Log", path: "/active-log" },
+        { name: "Account Statement", path: `/${motherAdmin?.role.toLowerCase()}/account-statement` },
+        { name: "Account Summary", path: `/${motherAdmin?.role.toLowerCase()}/account-summary` },
+        { name: "Profile", path: `/${motherAdmin?.role.toLowerCase()}/profile` },
+        { name: "Active Log", path: `/${motherAdmin?.role.toLowerCase()}/active-log` },
       ],
     },
     {
       name: "My Report",
       dropdown: [
-        { name: "Profit/Loss Report by Downline", path: "/my-report-pnl-downline" },
-        { name: "Profit/Loss Report by Parlay Downline", path: "/my-report-parlay-downline" },
-        { name: "Summary Profit/Loss Report", path: "/my-report-summary-pnl" },
-        { name: "Profit/Loss Report by Market", path: "/my-report-pl-market" },
-        { name: "Profit/Loss Report by Player", path: "/my-report-pl-player" },
-        { name: "Profit/Loss Report by All Casino", path: "/my-report-pl-casino" },
-        { name: "Profit/Loss Report by Casino Downline", path: "/my-report-pnl-casino-downline" },
-        { name: "Spin History", path: "/my-report-spin" },
-        { name: "Pending Spin Users", path: "/my-report-spinList" },
-        { name: "User Ref Commision Report", path: "/my-report-PlAgentRef" },
-        { name: "User Referral List", path: "/my-report-user-referral-list" },
+        {
+          name: "Profit/Loss Report by Downline",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pnl-downline`,
+        },
+        {
+          name: "Profit/Loss Report by Parlay Downline",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-parlay-downline`,
+        },
+        {
+          name: "Summary Profit/Loss Report",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-summary-pnl`,
+        },
+        {
+          name: "Profit/Loss Report by Market",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pl-market`,
+        },
+        {
+          name: "Profit/Loss Report by Player",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pl-player`,
+        },
+        {
+          name: "Profit/Loss Report by All Casino",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pl-casino`,
+        },
+        {
+          name: "Profit/Loss Report by Casino Downline",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pnl-casino-downline`,
+        },
+        {
+          name: "Spin History",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-spin`,
+        },
+        {
+          name: "Pending Spin Users",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-spinList`,
+        },
+        {
+          name: "User Ref Commision Report",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-PlAgentRef`,
+        },
+        {
+          name: "User Referral List",
+          path: `/${motherAdmin?.role.toLowerCase()}/my-report-user-referral-list`,
+        },
       ],
     },
     {
       name: "Management",
       dropdown: [
-        { name: "Risk Management", path: "/risk-management" },
-        { name: "MM", path: "/mm" },
-        { name: "Settings", path: "/settings" },
-        { name: "P-Settings", path: "/p-settings" },
-        { name: "Ticker", path: "/ticker" },
-        { name: "Pop Ticker", path: "/pop-ticker" },
-        { name: "Social", path: "/social" },
-        { name: "Upload Banner", path: "/upload-banner" },
-        {
-          name: "Casino Control",
-          dropdown: [
-            { name: "P-Bets", path: "/p-bets" },
-            { name: "AWC Casino Bets", path: "/awc-casino-bets" },
-            { name: "BO Casino Bets", path: "/bo-casino-bets" },
-            { name: "Bet Games Bets", path: "/bet-games-bets" },
-            { name: "AWC Casino Products", path: "/awc-casino-products" },
-          ],
-        },
+        { name: "Risk Management", path: `/${motherAdmin?.role.toLowerCase()}/risk-management` },
+        { name: "MM", path: `/${motherAdmin?.role.toLowerCase()}/mm` },
+        { name: "Settings", path: `/${motherAdmin?.role.toLowerCase()}/settings` },
+        { name: "P-Settings", path: `/${motherAdmin?.role.toLowerCase()}/p-settings` },
+        { name: "Ticker", path: `/${motherAdmin?.role.toLowerCase()}/ticker` },
+        { name: "Pop Ticker", path: `/${motherAdmin?.role.toLowerCase()}/pop-ticker` },
+        { name: "Social", path: `/${motherAdmin?.role.toLowerCase()}/social` },
+        { name: "Upload Banner", path: `/${motherAdmin?.role.toLowerCase()}/upload-banner` },
       ],
     },
-    { name: "BetList", path: "/bet-list" },
-    { name: "Live Bet", path: "/live-bet" },
-    { name: "Banking", path: "/banking" },
-    { name: "Block Market", path: "/block-market" },
-    { name: "B2C Agent List", path: "/b2c-agent-list" },
-    { name: "Search Users", path: "/search-users" },
+    { name: "BetList", path: `/${motherAdmin?.role.toLowerCase()}/bet-list` },
+    { name: "Live Bet", path: `/${motherAdmin?.role.toLowerCase()}/live-bet` },
+    { name: "Banking", path: `/${motherAdmin?.role.toLowerCase()}/banking` },
   ];
+
+  // Find the active nav item name based on the current path
+  const activeNavItemName = useMemo(() => {
+    const currentPath = location.pathname;
+
+    // Flatten navItems to include all paths (including dropdowns)
+    const allNavItems = navItems.flatMap((item) =>
+      item.dropdown
+        ? item.dropdown.map((drop) => ({ name: drop.name, path: drop.path }))
+        : [{ name: item.name, path: item.path }]
+    );
+
+    // Find the nav item whose path matches or is a prefix of the current path
+    const activeItem = allNavItems.find((item) =>
+      currentPath.startsWith(item.path)
+    );
+
+    return activeItem ? activeItem.name : "Downline List"; // Fallback to "Downline List"
+  }, [location.pathname, navItems]);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -114,7 +187,6 @@ const Sidebar = () => {
                   />
                 </button>
 
-                {/* First level dropdown */}
                 {activeDropdown === item.name && (
                   <div className="bg-gray-800 text-[12px]">
                     {item.dropdown.map((drop, i) =>
@@ -134,7 +206,6 @@ const Sidebar = () => {
                             />
                           </button>
 
-                          {/* Second level (Casino Control) */}
                           {activeSubDropdown === drop.name && (
                             <div className="bg-gray-900">
                               {drop.dropdown.map((sub, j) => (
@@ -188,7 +259,7 @@ const Sidebar = () => {
           )}
         </nav>
 
-        <button className="w-full text-left px-4 py-4 text-[12px] cursor-pointer hover:bg-red-500 flex items-center gap-4">
+        <button onClick={()=>logout()} className="w-full text-left px-4 py-4 text-[12px] cursor-pointer hover:bg-red-500 flex items-center gap-4">
           Logout <TbLogout size={18} />
         </button>
       </aside>
@@ -202,20 +273,20 @@ const Sidebar = () => {
         {/* Top Navbar */}
         <header className="bg-red-600 text-white p-6 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <h1 className="font-bold text-2xl">Downline List</h1>
+            <h1 className="font-bold text-2xl">{activeNavItemName}</h1>
           </div>
           <div className="px-4 py-1 rounded text-sm flex items-center gap-2">
             <div className="flex items-center justify-center gap-2">
               <span className="text-yellow-400 py-1 px-2 bg-gray-700 text-[12px] font-bold">
                 WL
               </span>
-              <span className="">{motherAdmin.username} [P]</span>
+              <span className="">{motherAdmin?.username} [P]</span>
             </div>
             <div className="flex items-center justify-center gap-2">
               <span className="font-bold py-1 px-2 bg-gray-700 text-[12px]">
                 Main
               </span>
-              <span className="">PBU 0.00</span>
+              <span className="">{balance}</span>
             </div>
 
             <button className="flex items-center justify-center gap-2 hover:cursor-pointer">
