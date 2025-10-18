@@ -15,15 +15,21 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router";
 
-
 const MotherAdmin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [admins, setAdmins] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const adminsPerPage = 15;
+  const [selectedAdminId, setSelectedAdminId] = useState(null);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [statusForm, setStatusForm] = useState({
+    adminId: "",
+    status: "Active",
+    password: "",
+  });
 
   const { motherAdmin } = useContext(AuthContext);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const timeZones = [
     "Asia/Dhaka",
@@ -43,16 +49,13 @@ const MotherAdmin = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const fetchAdmins = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admins`);
-      setAdmins(res.data.filter(u => u.role === "MA"));
+      setAdmins(res.data.filter((u) => u.role === "MA"));
     } catch (error) {
       console.error("Fetch error:", error);
       toast.error("❌ Failed to load admin data");
@@ -70,7 +73,7 @@ const MotherAdmin = () => {
         `${import.meta.env.VITE_API_URL}/api/admins`,
         {
           ...formData,
-          role: "MA", // Explicitly set role to "SA" for sub-admins
+          role: "MA",
           createdBy: motherAdmin?._id || null,
         }
       );
@@ -93,7 +96,6 @@ const MotherAdmin = () => {
     }
   };
 
-  // Pagination logic
   const indexOfLastAdmin = currentPage * adminsPerPage;
   const indexOfFirstAdmin = indexOfLastAdmin - adminsPerPage;
   const currentAdmins = admins.slice(indexOfFirstAdmin, indexOfLastAdmin);
@@ -106,7 +108,6 @@ const MotherAdmin = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  // ✅ Calculate totals for current page
   const totals = currentAdmins.reduce(
     (acc, u) => {
       acc.credit += u.credit || 0;
@@ -137,9 +138,36 @@ const MotherAdmin = () => {
     { icon: <FaLock />, label: "Block Market" },
   ];
 
+  const handleStatusChange = (e) => {
+    setStatusForm({ ...statusForm, [e.target.name]: e.target.value });
+  };
+
+  const openStatusModal = (adminId) => {
+    setSelectedAdminId(adminId);
+    setStatusForm({ adminId, status: "Active", password: "" });
+    setStatusModalOpen(true);
+  };
+
+  const submitStatusChange = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admins/change-status`,
+        statusForm
+      );
+      if (res.data.success) {
+        toast.success("✅ Status changed successfully!");
+        setStatusModalOpen(false);
+        fetchAdmins(); // Refresh the admin list
+      }
+    } catch (error) {
+      console.error("Error changing status:", error);
+      toast.error("❌ Failed to change status");
+    }
+  };
+
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
-      {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2">
           <input
@@ -173,7 +201,6 @@ const MotherAdmin = () => {
         </div>
       </div>
 
-      {/* Summary Section */}
       <div className="flex bg-[#f5f6f8] border-b mb-5 overflow-hidden">
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Total Balance</p>
@@ -193,84 +220,67 @@ const MotherAdmin = () => {
         </div>
         <div className="flex-1 px-4 py-3">
           <p className="text-gray-600 text-sm">Transferable P/L with Upline</p>
-          <h2 className="font-extrabold text-lg text-red-600">
-            PBU (00.00)
-          </h2>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
         </div>
       </div>
 
-      {/* Table Section */}
       <div className="bg-white rounded shadow overflow-hidden">
         <table className="w-full border-collapse">
           <thead className="bg-[#1f3349] text-white">
-            {" "}
             <tr>
-              {" "}
-              <th className="p-2 text-left">Account</th>{" "}
-              <th className="p-2 text-right">Credit Ref.</th>{" "}
+              <th className="p-2 text-left">Account</th>
+              <th className="p-2 text-right">Credit Ref.</th>
               <th className="p-2 text-right">
-                {" "}
                 <span className="flex items-center justify-center">
-                  {" "}
-                  Balance <LuArrowUpDown />{" "}
-                </span>{" "}
-              </th>{" "}
+                  Balance <LuArrowUpDown />
+                </span>
+              </th>
               <th className="p-2 text-right">
-                {" "}
                 <span className="flex items-center justify-center">
-                  {" "}
-                  Exposure <LuArrowUpDown />{" "}
-                </span>{" "}
-              </th>{" "}
+                  Exposure <LuArrowUpDown />
+                </span>
+              </th>
               <th className="p-2 text-right">
-                {" "}
                 <span className="flex items-center justify-center">
-                  {" "}
-                  Avail. bal. <LuArrowUpDown />{" "}
-                </span>{" "}
-              </th>{" "}
+                  Avail. bal. <LuArrowUpDown />
+                </span>
+              </th>
               <th className="p-2 text-right">
-                {" "}
                 <span className="flex items-center justify-center">
-                  {" "}
-                  TotalBalance <LuArrowUpDown />{" "}
-                </span>{" "}
-              </th>{" "}
+                  TotalBalance <LuArrowUpDown />
+                </span>
+              </th>
               <th className="p-2 text-right">
-                {" "}
                 <span className="flex items-center justify-center">
-                  {" "}
-                  Player Balance <LuArrowUpDown />{" "}
-                </span>{" "}
-              </th>{" "}
+                  Player Balance <LuArrowUpDown />
+                </span>
+              </th>
               <th className="p-2 text-right">
-                {" "}
                 <span className="flex items-center justify-center">
-                  {" "}
-                  Ref. P/L <LuArrowUpDown />{" "}
-                </span>{" "}
-              </th>{" "}
+                  Ref. P/L <LuArrowUpDown />
+                </span>
+              </th>
               <th className="p-2 text-center">
-                {" "}
                 <span className="flex items-center justify-center">
-                  {" "}
-                  Status <LuArrowUpDown />{" "}
-                </span>{" "}
-              </th>{" "}
-              <th className="p-2 text-right">Action</th>{" "}
-            </tr>{" "}
+                  Status <LuArrowUpDown />
+                </span>
+              </th>
+              <th className="p-2 text-right">Action</th>
+            </tr>
           </thead>
           <tbody>
             {currentAdmins.map((u, i) => (
               <tr
                 key={u._id}
-                className={`border-b text-sm ${
-                  i % 2 === 0 ? "bg-white" : "bg-gray-50"
-                }`}
+                className={`border-b text-sm ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
               >
                 <td className="p-2 flex items-center space-x-1">
                   <span
-                    onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`
+                      )
+                    }
                     className="bg-blue-200 font-bold text-blue-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-blue-300 transition"
                   >
                     {u.role}
@@ -280,32 +290,27 @@ const MotherAdmin = () => {
                   </span>
                 </td>
                 <td className="p-2 text-right">{u.credit?.toLocaleString()}</td>
-                <td className="p-2 text-right">
-                  {u.balance?.toLocaleString()}
-                </td>
+                <td className="p-2 text-right">{u.balance?.toLocaleString()}</td>
                 <td className="p-2 text-right text-red-600">
                   {u.exposure?.toLocaleString()}
                 </td>
-                <td className="p-2 text-right">
-                  {u.availBal?.toLocaleString()}
-                </td>
-                <td className="p-2 text-right">
-                  {u.totalBal?.toLocaleString()}
-                </td>
-                <td className="p-2 text-right">
-                  {u.playerBal?.toLocaleString()}
-                </td>
+                <td className="p-2 text-right">{u.availBal?.toLocaleString()}</td>
+                <td className="p-2 text-right">{u.totalBal?.toLocaleString()}</td>
+                <td className="p-2 text-right">{u.playerBal?.toLocaleString()}</td>
                 <td className="p-2 text-right text-red-600">
                   {u.refPL?.toLocaleString()}
                 </td>
                 <td className="p-2 text-center">
-                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold ">
+                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold">
                     ● {u.status}
                   </span>
                 </td>
                 <td className="p-2 text-center">
                   <div className="flex justify-center space-x-2">
-                    <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
+                    <button
+                      className="p-2 border rounded bg-yellow-50 hover:cursor-pointer"
+                      onClick={() => openStatusModal(u._id)}
+                    >
                       <FaCog size={16} />
                     </button>
                     <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
@@ -318,28 +323,16 @@ const MotherAdmin = () => {
                 </td>
               </tr>
             ))}
-
-            {/* ✅ Totals Row */}
             <tr className="bg-[#FFEDD5] border-t font-semibold">
               <td className="p-2">Total (Page {currentPage})</td>
-              <td className="p-2 text-right">
-                {totals.credit.toLocaleString()}
-              </td>
-              <td className="p-2 text-right">
-                {totals.balance.toLocaleString()}
-              </td>
+              <td className="p-2 text-right">{totals.credit.toLocaleString()}</td>
+              <td className="p-2 text-right">{totals.balance.toLocaleString()}</td>
               <td className="p-2 text-right text-red-600">
                 {totals.exposure.toLocaleString()}
               </td>
-              <td className="p-2 text-right">
-                {totals.availBal.toLocaleString()}
-              </td>
-              <td className="p-2 text-right">
-                {totals.totalBal.toLocaleString()}
-              </td>
-              <td className="p-2 text-right">
-                {totals.playerBal.toLocaleString()}
-              </td>
+              <td className="p-2 text-right">{totals.availBal.toLocaleString()}</td>
+              <td className="p-2 text-right">{totals.totalBal.toLocaleString()}</td>
+              <td className="p-2 text-right">{totals.playerBal.toLocaleString()}</td>
               <td className="p-2 text-right text-red-600">
                 {totals.refPL.toLocaleString()}
               </td>
@@ -349,7 +342,6 @@ const MotherAdmin = () => {
           </tbody>
         </table>
 
-        {/* Pagination */}
         <div className="flex items-center justify-center p-3 border-t border-b border-dashed text-sm mt-4">
           <button
             onClick={prevPage}
@@ -370,7 +362,6 @@ const MotherAdmin = () => {
           </button>
         </div>
 
-        {/* Bottom Menu */}
         <div className="flex flex-wrap justify-end mr-8 items-center gap-3 py-2 bg-white border-t border-gray-300">
           {menuItems.map((item, index) => (
             <React.Fragment key={index}>
@@ -385,7 +376,6 @@ const MotherAdmin = () => {
         </div>
       </div>
 
-      {/* Add Admin Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-xl">
           <div className="bg-white shadow-lg w-1/2 rounded-2xl">
@@ -403,7 +393,6 @@ const MotherAdmin = () => {
             </div>
             <div className="p-4">
               <h4 className="text-lg font-bold mb-2">Personal Information</h4>
-
               <form
                 className="max-w-4xl mx-auto bg-white p-8 rounded-lg"
                 onSubmit={handleSubmit}
@@ -425,7 +414,6 @@ const MotherAdmin = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Password
@@ -441,7 +429,6 @@ const MotherAdmin = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         First Name
@@ -458,7 +445,6 @@ const MotherAdmin = () => {
                       <span className="text-red-600">*</span>
                     </div>
                   </div>
-
                   <div>
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -475,7 +461,6 @@ const MotherAdmin = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Phone
@@ -491,7 +476,6 @@ const MotherAdmin = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         TimeZone
@@ -513,7 +497,6 @@ const MotherAdmin = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="flex justify-end">
                   <button
                     type="submit"
@@ -524,6 +507,80 @@ const MotherAdmin = () => {
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+
+      {statusModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-xl">
+          <div className="bg-white shadow-lg w-1/3 rounded-2xl">
+            <div className="bg-red-600 text-white p-2 flex justify-between items-center rounded-tl-xl rounded-tr-xl">
+              <h3 className="text-lg font-bold">Change Status</h3>
+              <button
+                onClick={() => setStatusModalOpen(false)}
+                className="text-white hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={submitStatusChange} className="p-4">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  AD
+                </label>
+                <input
+                  type="text"
+                  value={selectedAdminId || ""}
+                  disabled
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                />
+              </div>
+              <div className="mb-4 flex justify-center space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setStatusForm({ ...statusForm, status: "Active" })}
+                  className={`p-2 border rounded ${statusForm.status === "Active" ? "bg-gray-300" : "bg-yellow-50"}`}
+                >
+                  <span className="text-green-600">✔</span> Active
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatusForm({ ...statusForm, status: "Suspend" })}
+                  className={`p-2 border rounded ${statusForm.status === "Suspend" ? "bg-gray-300" : "bg-yellow-50"}`}
+                >
+                  <span className="text-red-600">✖</span> Suspend
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatusForm({ ...statusForm, status: "Locked" })}
+                  className={`p-2 border rounded ${statusForm.status === "Locked" ? "bg-gray-300" : "bg-yellow-50"}`}
+                >
+                  <span className="text-gray-600">🔒</span> Locked
+                </button>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={statusForm.password}
+                  onChange={handleStatusChange}
+                  placeholder="Enter password"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition"
+                >
+                  Change
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
