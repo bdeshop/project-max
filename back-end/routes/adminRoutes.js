@@ -495,4 +495,31 @@ router.post("/change-password", async (req, res) => {
   }
 });
 
+// Change Admin Status
+router.post("/change-status", async (req, res) => {
+  try {
+    const { adminId, status, password } = req.body;
+
+    // Find admin by ID
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ success: false, message: "Admin not found" });
+    }
+
+    // Verify password
+    if (admin.password !== password) {
+      return res.status(401).json({ success: false, message: "Invalid password" });
+    }
+
+    // Update status
+    admin.status = status;
+    await admin.save();
+
+    res.status(200).json({ success: true, message: "Status changed successfully", admin });
+  } catch (error) {
+    console.error("Error changing status:", error);
+    res.status(500).json({ success: false, message: "Failed to change status", error: error.message });
+  }
+});
+
 export default router;
