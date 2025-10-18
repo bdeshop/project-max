@@ -22,8 +22,6 @@ import ProfitLossReportByAllCasino from "../pages/Reports/ProfitLossReportByAllC
 import ProfitLossReportByCasinoDownLine from "../pages/Reports/ProfitLossReportByCasinoDownLine";
 import SpinHistory from "../pages/Reports/SpinHistory";
 import PendingSpinUsers from "../pages/Reports/PendingSpinUsers";
-import UserRefCommisionReport from "../pages/Reports/UserRefCommisionReport";
-import UserReferralList from "../pages/Reports/UserReferralList";
 import RiskManagement from "../pages/Managements/RiskManagement";
 import MM from "../pages/Managements/MM";
 import Settings from "../pages/Managements/Settings";
@@ -159,14 +157,6 @@ export const routes = createBrowserRouter([
       {
         path: "my-report-spinList",
         element: <PendingSpinUsers></PendingSpinUsers>,
-      },
-      {
-        path: "my-report-PlAgentRef",
-        element: <UserRefCommisionReport></UserRefCommisionReport>,
-      },
-      {
-        path: "my-report-user-referral-list",
-        element: <UserReferralList></UserReferralList>,
       },
       {
         path: "risk-management",
@@ -329,14 +319,6 @@ export const routes = createBrowserRouter([
         element: <PendingSpinUsers></PendingSpinUsers>,
       },
       {
-        path: "my-report-PlAgentRef",
-        element: <UserRefCommisionReport></UserRefCommisionReport>,
-      },
-      {
-        path: "my-report-user-referral-list",
-        element: <UserReferralList></UserReferralList>,
-      },
-      {
         path: "risk-management",
         element: <RiskManagement></RiskManagement>,
       },
@@ -473,14 +455,7 @@ export const routes = createBrowserRouter([
         path: "my-report-spinList",
         element: <PendingSpinUsers></PendingSpinUsers>,
       },
-      {
-        path: "my-report-PlAgentRef",
-        element: <UserRefCommisionReport></UserRefCommisionReport>,
-      },
-      {
-        path: "my-report-user-referral-list",
-        element: <UserReferralList></UserReferralList>,
-      },
+     
       {
         path: "risk-management",
         element: <RiskManagement></RiskManagement>,
@@ -614,14 +589,7 @@ export const routes = createBrowserRouter([
         path: "my-report-spinList",
         element: <PendingSpinUsers></PendingSpinUsers>,
       },
-      {
-        path: "my-report-PlAgentRef",
-        element: <UserRefCommisionReport></UserRefCommisionReport>,
-      },
-      {
-        path: "my-report-user-referral-list",
-        element: <UserReferralList></UserReferralList>,
-      },
+      
       {
         path: "risk-management",
         element: <RiskManagement></RiskManagement>,
@@ -751,14 +719,6 @@ export const routes = createBrowserRouter([
       {
         path: "my-report-spinList",
         element: <PendingSpinUsers></PendingSpinUsers>,
-      },
-      {
-        path: "my-report-PlAgentRef",
-        element: <UserRefCommisionReport></UserRefCommisionReport>,
-      },
-      {
-        path: "my-report-user-referral-list",
-        element: <UserReferralList></UserReferralList>,
       },
       {
         path: "risk-management",

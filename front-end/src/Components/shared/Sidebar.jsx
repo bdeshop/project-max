@@ -9,7 +9,7 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [activeSubDropdown, setActiveSubDropdown] = useState(null);
-  const { motherAdmin, logout,balance } = useContext(AuthContext);
+  const { motherAdmin, logout, balance, reload } = useContext(AuthContext);
   const location = useLocation(); // To get the current route
 
   const handleDropdown = (menu) => {
@@ -71,10 +71,22 @@ const Sidebar = () => {
     {
       name: "My Account",
       dropdown: [
-        { name: "Account Statement", path: `/${motherAdmin?.role.toLowerCase()}/account-statement` },
-        { name: "Account Summary", path: `/${motherAdmin?.role.toLowerCase()}/account-summary` },
-        { name: "Profile", path: `/${motherAdmin?.role.toLowerCase()}/profile` },
-        { name: "Active Log", path: `/${motherAdmin?.role.toLowerCase()}/active-log` },
+        {
+          name: "Account Statement",
+          path: `/${motherAdmin?.role.toLowerCase()}/account-statement`,
+        },
+        {
+          name: "Account Summary",
+          path: `/${motherAdmin?.role.toLowerCase()}/account-summary`,
+        },
+        {
+          name: "Profile",
+          path: `/${motherAdmin?.role.toLowerCase()}/profile`,
+        },
+        {
+          name: "Active Log",
+          path: `/${motherAdmin?.role.toLowerCase()}/active-log`,
+        },
       ],
     },
     {
@@ -116,27 +128,34 @@ const Sidebar = () => {
           name: "Pending Spin Users",
           path: `/${motherAdmin?.role.toLowerCase()}/my-report-spinList`,
         },
-        {
-          name: "User Ref Commision Report",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-PlAgentRef`,
-        },
-        {
-          name: "User Referral List",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-user-referral-list`,
-        },
       ],
     },
     {
       name: "Management",
       dropdown: [
-        { name: "Risk Management", path: `/${motherAdmin?.role.toLowerCase()}/risk-management` },
+        {
+          name: "Risk Management",
+          path: `/${motherAdmin?.role.toLowerCase()}/risk-management`,
+        },
         { name: "MM", path: `/${motherAdmin?.role.toLowerCase()}/mm` },
-        { name: "Settings", path: `/${motherAdmin?.role.toLowerCase()}/settings` },
-        { name: "P-Settings", path: `/${motherAdmin?.role.toLowerCase()}/p-settings` },
+        {
+          name: "Settings",
+          path: `/${motherAdmin?.role.toLowerCase()}/settings`,
+        },
+        {
+          name: "P-Settings",
+          path: `/${motherAdmin?.role.toLowerCase()}/p-settings`,
+        },
         { name: "Ticker", path: `/${motherAdmin?.role.toLowerCase()}/ticker` },
-        { name: "Pop Ticker", path: `/${motherAdmin?.role.toLowerCase()}/pop-ticker` },
+        {
+          name: "Pop Ticker",
+          path: `/${motherAdmin?.role.toLowerCase()}/pop-ticker`,
+        },
         { name: "Social", path: `/${motherAdmin?.role.toLowerCase()}/social` },
-        { name: "Upload Banner", path: `/${motherAdmin?.role.toLowerCase()}/upload-banner` },
+        {
+          name: "Upload Banner",
+          path: `/${motherAdmin?.role.toLowerCase()}/upload-banner`,
+        },
       ],
     },
     { name: "BetList", path: `/${motherAdmin?.role.toLowerCase()}/bet-list` },
@@ -259,7 +278,10 @@ const Sidebar = () => {
           )}
         </nav>
 
-        <button onClick={()=>logout()} className="w-full text-left px-4 py-4 text-[12px] cursor-pointer hover:bg-red-500 flex items-center gap-4">
+        <button
+          onClick={() => logout()}
+          className="w-full text-left px-4 py-4 text-[12px] cursor-pointer hover:bg-red-500 flex items-center gap-4"
+        >
           Logout <TbLogout size={18} />
         </button>
       </aside>
@@ -289,7 +311,10 @@ const Sidebar = () => {
               <span className="">{balance}</span>
             </div>
 
-            <button className="flex items-center justify-center gap-2 hover:cursor-pointer">
+            <button
+              onClick={reload}
+              className="flex items-center justify-center gap-2 hover:cursor-pointer"
+            >
               <span className="font-bold py-2 px-4 bg-gray-700 text-[12px]">
                 <TfiReload size={20} />
               </span>

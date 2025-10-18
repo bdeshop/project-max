@@ -61,7 +61,7 @@ const MotherAdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-900 via-sky-900 to-gray-900">
+    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-red-900 via-sky-900 to-green-900">
       <div className="flex flex-col md:flex-row bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden shadow-2xl w-[90%] max-w-4xl border border-gray-700">
         {/* Left Side */}
         <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-b from-sky-700 to-blue-900 p-8">
