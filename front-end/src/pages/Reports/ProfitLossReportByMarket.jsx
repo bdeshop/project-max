@@ -176,6 +176,9 @@ const ProfitLossReportByMarket = () => {
           <button className="border border-gray-300 px-3 py-1 text-sm">Next</button>
         </div>
       </div>
+      <div className="text-2xl text-center mt-5">
+            Please Include a Api !!
+          </div>
     </div>
   );
 };

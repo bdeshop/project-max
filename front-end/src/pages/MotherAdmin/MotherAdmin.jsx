@@ -272,13 +272,17 @@ const MotherAdmin = () => {
             {currentAdmins.map((u, i) => (
               <tr
                 key={u._id}
-                className={`border-b text-sm ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+                className={`border-b text-sm ${
+                  i % 2 === 0 ? "bg-white" : "bg-gray-50"
+                }`}
               >
                 <td className="p-2 flex items-center space-x-1">
                   <span
                     onClick={() =>
                       navigate(
-                        `/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`
+                        `/${motherAdmin.role.toLowerCase()}/created-admins/${
+                          u._id
+                        }`
                       )
                     }
                     className="bg-blue-200 font-bold text-blue-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-blue-300 transition"
@@ -290,18 +294,36 @@ const MotherAdmin = () => {
                   </span>
                 </td>
                 <td className="p-2 text-right">{u.credit?.toLocaleString()}</td>
-                <td className="p-2 text-right">{u.balance?.toLocaleString()}</td>
+                <td className="p-2 text-right">
+                  {u.balance?.toLocaleString()}
+                </td>
                 <td className="p-2 text-right text-red-600">
                   {u.exposure?.toLocaleString()}
                 </td>
-                <td className="p-2 text-right">{u.availBal?.toLocaleString()}</td>
-                <td className="p-2 text-right">{u.totalBal?.toLocaleString()}</td>
-                <td className="p-2 text-right">{u.playerBal?.toLocaleString()}</td>
+                <td className="p-2 text-right">
+                  {u.availBal?.toLocaleString()}
+                </td>
+                <td className="p-2 text-right">
+                  {u.totalBal?.toLocaleString()}
+                </td>
+                <td className="p-2 text-right">
+                  {u.playerBal?.toLocaleString()}
+                </td>
                 <td className="p-2 text-right text-red-600">
                   {u.refPL?.toLocaleString()}
                 </td>
                 <td className="p-2 text-center">
-                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold">
+                  <span
+                    className={`px-2 py-0.5 rounded-sm font-bold ${
+                      u.status === "Active"
+                        ? "bg-green-100 text-green-700"
+                        : u.status === "Suspend"
+                        ? "bg-red-100 text-red-700"
+                        : u.status === "Locked"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-gray-100 text-gray-700" // default fallback
+                    }`}
+                  >
                     ● {u.status}
                   </span>
                 </td>
@@ -325,14 +347,24 @@ const MotherAdmin = () => {
             ))}
             <tr className="bg-[#FFEDD5] border-t font-semibold">
               <td className="p-2">Total (Page {currentPage})</td>
-              <td className="p-2 text-right">{totals.credit.toLocaleString()}</td>
-              <td className="p-2 text-right">{totals.balance.toLocaleString()}</td>
+              <td className="p-2 text-right">
+                {totals.credit.toLocaleString()}
+              </td>
+              <td className="p-2 text-right">
+                {totals.balance.toLocaleString()}
+              </td>
               <td className="p-2 text-right text-red-600">
                 {totals.exposure.toLocaleString()}
               </td>
-              <td className="p-2 text-right">{totals.availBal.toLocaleString()}</td>
-              <td className="p-2 text-right">{totals.totalBal.toLocaleString()}</td>
-              <td className="p-2 text-right">{totals.playerBal.toLocaleString()}</td>
+              <td className="p-2 text-right">
+                {totals.availBal.toLocaleString()}
+              </td>
+              <td className="p-2 text-right">
+                {totals.totalBal.toLocaleString()}
+              </td>
+              <td className="p-2 text-right">
+                {totals.playerBal.toLocaleString()}
+              </td>
               <td className="p-2 text-right text-red-600">
                 {totals.refPL.toLocaleString()}
               </td>
@@ -518,7 +550,7 @@ const MotherAdmin = () => {
               <h3 className="text-lg font-bold">Change Status</h3>
               <button
                 onClick={() => setStatusModalOpen(false)}
-                className="text-white hover:text-gray-200"
+                className="text-white cursor-pointer hover:text-gray-200"
               >
                 ✕
               </button>
@@ -538,22 +570,40 @@ const MotherAdmin = () => {
               <div className="mb-4 flex justify-center space-x-4">
                 <button
                   type="button"
-                  onClick={() => setStatusForm({ ...statusForm, status: "Active" })}
-                  className={`p-2 border rounded ${statusForm.status === "Active" ? "bg-gray-300" : "bg-yellow-50"}`}
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Active" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Active"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
                 >
                   <span className="text-green-600">✔</span> Active
                 </button>
                 <button
                   type="button"
-                  onClick={() => setStatusForm({ ...statusForm, status: "Suspend" })}
-                  className={`p-2 border rounded ${statusForm.status === "Suspend" ? "bg-gray-300" : "bg-yellow-50"}`}
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Suspend" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Suspend"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
                 >
                   <span className="text-red-600">✖</span> Suspend
                 </button>
                 <button
                   type="button"
-                  onClick={() => setStatusForm({ ...statusForm, status: "Locked" })}
-                  className={`p-2 border rounded ${statusForm.status === "Locked" ? "bg-gray-300" : "bg-yellow-50"}`}
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Locked" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Locked"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
                 >
                   <span className="text-gray-600">🔒</span> Locked
                 </button>
@@ -575,7 +625,7 @@ const MotherAdmin = () => {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition"
+                  className="bg-red-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-red-700 transition"
                 >
                   Change
                 </button>

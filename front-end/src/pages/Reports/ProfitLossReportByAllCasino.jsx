@@ -83,7 +83,9 @@ const ProfitLossReportByAllCasino = () => {
               Get P & L
             </button>
           </div>
-
+<div className="text-2xl text-center mt-5">
+            Please Include a Api !!
+          </div>
           {/* Bottom Border */}
           <div className="mt-3 border-b border-gray-300"></div>
         </div>

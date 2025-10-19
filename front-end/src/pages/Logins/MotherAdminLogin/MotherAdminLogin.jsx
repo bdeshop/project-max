@@ -13,19 +13,17 @@ const MotherAdminLogin = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // 🔢 র‍্যান্ডম ৪ ডিজিট কোড তৈরি
+  // 🔢 Random 4-digit code
   function generateCode() {
     return Math.floor(1000 + Math.random() * 9000);
   }
 
-  // 🔁 কোড রিফ্রেশ
+  // 🔁 Refresh code
   const handleRefresh = () => setCode(generateCode());
 
-  // 🚀 সাবমিট হ্যান্ডলার
+  // 🚀 Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // ✅ কোড চেক
     if (validationInput != code) {
       toast.error("Validation code mismatch!");
       return;
@@ -38,21 +36,20 @@ const MotherAdminLogin = () => {
       );
 
       const data = res.data;
-
-      // ✅ লগইন সফল হলে
       if (data?.user) {
-        login(data.user); // context + localStorage এ ইউজার সেভ
+        login(data.user);
         toast.success("Login successful!");
-
-        if (data.user.role === "MA") {
-          navigate("/ma/mother-admin");
-        } else {
+        if (data.user.role === "MA") navigate("/ma/mother-admin");
+        else if (data.user.role === "SA") navigate("/sa/sub-admin");
+        else if (data.user.role === "MT") navigate("/mt/master");
+        else if (data.user.role === "AG") navigate("/ag/agent");
+        else if (data.user.role === "SG") navigate("/sg/sub-agent");
+        else {
           toast.error("You do not have permission to access this page!");
           navigate("/restricted");
         }
       }
     } catch (error) {
-      // ⚠️ ব্যাকএন্ডের এরর হ্যান্ডেল
       console.error("Login Error:", error);
       toast.error(
         error.response?.data?.message || "Something went wrong. Try again!"
@@ -61,27 +58,29 @@ const MotherAdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-red-900 via-sky-900 to-green-900">
-      <div className="flex flex-col md:flex-row bg-white/10 backdrop-blur-lg rounded-2xl overflow-hidden shadow-2xl w-[90%] max-w-4xl border border-gray-700">
-        {/* Left Side */}
-        <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-gradient-to-b from-sky-700 to-blue-900 p-8">
-          <img
-            src="https://i.ibb.co/w0xFBM8/agent-login.png"
-            alt="Agent Login"
-            className="w-60 mb-6"
-          />
-          <h1 className="text-2xl font-bold text-white tracking-wide">
-            Mother Admin Portal
-          </h1>
-          <p className="text-gray-300 mt-2 text-center text-sm">
-            Manage your clients and deposits securely.
-          </p>
-        </div>
+    <div
+      className="min-h-screen flex justify-center items-center bg-cover bg-center relative"
+      style={{
+        backgroundImage:
+          "url('https://i.ibb.co.com/bMktQGPC/wp2793078.jpg')", // 🔥 Replace with your background image
+      }}
+    >
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/40"></div>
 
-        {/* Right Side (Form) */}
-        <div className="w-full md:w-1/2 p-8 flex flex-col justify-center bg-black/60">
-          <h2 className="text-center text-white text-2xl font-semibold mb-6">
-            Mother Admin Login
+      {/* Login Box */}
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-20 p-10  rounded-lg w-[90%] max-w-md">
+        {/* Logo */}
+        <img
+          src="https://i.ibb.co/hYsp1w8/enjoy-logo.png"
+          alt="Logo"
+          className="w-40 mb-4"
+        />
+
+        {/* Form */}
+        <div className="w-full border-l-2 border-white pl-6">
+          <h2 className="text-center text-white text-2xl font-bold mb-6">
+            Admin <span className="text-gray-300 font-normal">Sign in</span>
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -91,7 +90,7 @@ const MotherAdminLogin = () => {
               placeholder="Username"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-full px-4 py-2 bg-transparent border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-2 bg-white text-black rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
               required
             />
 
@@ -101,7 +100,7 @@ const MotherAdminLogin = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 bg-transparent border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="w-full px-4 py-2 bg-white text-black rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
               required
             />
 
@@ -113,28 +112,40 @@ const MotherAdminLogin = () => {
                 value={validationInput}
                 onChange={(e) => setValidationInput(e.target.value)}
                 placeholder="Validation Code"
-                className="flex-1 px-4 py-2 bg-transparent border border-gray-500 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="flex-1 px-4 py-2 bg-white text-black rounded-l-md focus:outline-none focus:ring-2 focus:ring-red-600"
               />
-              <span className="px-4 py-2 bg-white text-black font-bold border border-gray-500">
+              <span className="px-4 py-2 bg-white text-black font-bold border-l border-gray-400">
                 {code}
               </span>
               <button
                 type="button"
                 onClick={handleRefresh}
-                className="px-4 py-2 cursor-pointer bg-sky-600 hover:bg-sky-700 rounded-r-lg flex items-center justify-center"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-r-md flex items-center justify-center"
               >
-                <FaSyncAlt size={24} className="text-white" />
+                <FaSyncAlt size={20} className="text-white" />
               </button>
             </div>
 
-            {/* Submit */}
+            {/* Login Button */}
             <button
               type="submit"
-              className="w-full cursor-pointer py-2 bg-gradient-to-r from-sky-700 to-blue-600 hover:opacity-90 text-white font-semibold rounded-lg transition-all"
+              className="w-full py-2 cursor-pointer bg-red-600 hover:bg-red-700 text-white font-semibold rounded-md transition-all duration-200"
             >
               Login
             </button>
           </form>
+
+          {/* APK Download */}
+          <div className="flex justify-center mt-6">
+            <button className="flex items-center cursor-pointer gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/226/226770.png"
+                alt="apk"
+                className="w-5"
+              />
+              <span className="text-sm">Download APK</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

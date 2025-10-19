@@ -3,7 +3,9 @@ import React from 'react';
 const UploadBanner = () => {
     return (
         <div>
-            Upload Banner Page
+           <div className="text-2xl text-center mt-5">
+            Please Include a Api !!
+          </div>
         </div>
     );
 };

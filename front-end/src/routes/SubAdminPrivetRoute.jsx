@@ -10,7 +10,7 @@ const SubAdminPrivetRoute = ({ children }) => {
 
   // Check if user is logged in and has role "Mother Admin"
   if (!motherAdmin || motherAdmin.role !== "SA") {
-    return <Navigate to="/sa-login" state={{ from: location?.pathname }} />;
+    return <Navigate to="/ad-login" state={{ from: location?.pathname }} />;
   }
 
   return children;

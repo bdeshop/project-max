@@ -20,6 +20,13 @@ const Agent = () => {
   const [agents, setAgents] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const adminsPerPage = 15;
+  const [selectedAdminId, setSelectedAdminId] = useState(null);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [statusForm, setStatusForm] = useState({
+    adminId: "",
+    status: "Active",
+    password: "",
+  });
 
   const { motherAdmin } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -53,7 +60,7 @@ const Agent = () => {
       const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/admins/created/${motherAdmin?._id}`
       );
-      setAgents(res.data.filter(u => u.role === "AG"));
+      setAgents(res.data.filter((u) => u.role === "AG"));
     } catch (error) {
       console.error("Fetch error:", error);
       toast.error("❌ Failed to load agent data");
@@ -139,6 +146,34 @@ const Agent = () => {
     { icon: <FaCog />, label: "Change Status" },
     { icon: <FaLock />, label: "Block Market" },
   ];
+
+  const handleStatusChange = (e) => {
+    setStatusForm({ ...statusForm, [e.target.name]: e.target.value });
+  };
+
+  const openStatusModal = (adminId) => {
+    setSelectedAdminId(adminId);
+    setStatusForm({ adminId, status: "Active", password: "" });
+    setStatusModalOpen(true);
+  };
+
+  const submitStatusChange = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admins/change-status`,
+        statusForm
+      );
+      if (res.data.success) {
+        toast.success("✅ Status changed successfully!");
+        setStatusModalOpen(false);
+        fetchAgents(); // Refresh the agent list
+      }
+    } catch (error) {
+      console.error("Error changing status:", error);
+      toast.error("❌ Failed to change status");
+    }
+  };
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
@@ -257,7 +292,13 @@ const Agent = () => {
               >
                 <td className="p-2 flex items-center space-x-1">
                   <span
-                    onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)} // Assuming same route for agents' details
+                    onClick={() =>
+                      navigate(
+                        `/${motherAdmin.role.toLowerCase()}/created-admins/${
+                          u._id
+                        }`
+                      )
+                    } // Assuming same route for agents' details
                     className="bg-gray-200 font-bold text-gray-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-gray-300 transition"
                   >
                     {u.role}
@@ -286,13 +327,26 @@ const Agent = () => {
                   {u.refPL?.toLocaleString()}
                 </td>
                 <td className="p-2 text-center">
-                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold ">
+                  <span
+                    className={`px-2 py-0.5 rounded-sm font-bold ${
+                      u.status === "Active"
+                        ? "bg-green-100 text-green-700"
+                        : u.status === "Suspend"
+                        ? "bg-red-100 text-red-700"
+                        : u.status === "Locked"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-gray-100 text-gray-700" // default fallback
+                    }`}
+                  >
                     ● {u.status}
                   </span>
                 </td>
                 <td className="p-2 text-center">
                   <div className="flex justify-center space-x-2">
-                    <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
+                    <button
+                      className="p-2 border rounded bg-yellow-50 hover:cursor-pointer"
+                      onClick={() => openStatusModal(u._id)}
+                    >
                       <FaCog size={16} />
                     </button>
                     <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
@@ -511,6 +565,98 @@ const Agent = () => {
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+
+      {statusModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-xl">
+          <div className="bg-white shadow-lg w-1/3 rounded-2xl">
+            <div className="bg-red-600 text-white p-2 flex justify-between items-center rounded-tl-xl rounded-tr-xl">
+              <h3 className="text-lg font-bold">Change Status</h3>
+              <button
+                onClick={() => setStatusModalOpen(false)}
+                className="text-white cursor-pointer hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={submitStatusChange} className="p-4">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  AD
+                </label>
+                <input
+                  type="text"
+                  value={selectedAdminId || ""}
+                  disabled
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                />
+              </div>
+              <div className="mb-4 flex justify-center space-x-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Active" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Active"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
+                >
+                  <span className="text-green-600">✔</span> Active
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Suspend" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Suspend"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
+                >
+                  <span className="text-red-600">✖</span> Suspend
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Locked" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Locked"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
+                >
+                  <span className="text-gray-600">🔒</span> Locked
+                </button>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={statusForm.password}
+                  onChange={handleStatusChange}
+                  placeholder="Enter password"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="bg-red-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-red-700 transition"
+                >
+                  Change
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -23,6 +23,15 @@ const Sidebar = () => {
 
   // Conditionally define Downline dropdown based on role
   let downlineDropdown = [];
+  let ControllerDropdown = [];
+
+  if (motherAdmin?.role === "MA") {
+    ControllerDropdown = [
+      { name: "Home Control", path: `/${"ma"}/home-control` },
+      { name: "Color Control", path: `/${"ma"}/color-control` },
+    ];
+  }
+
   if (motherAdmin?.role === "MA") {
     downlineDropdown = [
       { name: "Mother Admin", path: `/${"ma"}/mother-admin` },
@@ -161,6 +170,10 @@ const Sidebar = () => {
     { name: "BetList", path: `/${motherAdmin?.role.toLowerCase()}/bet-list` },
     { name: "Live Bet", path: `/${motherAdmin?.role.toLowerCase()}/live-bet` },
     { name: "Banking", path: `/${motherAdmin?.role.toLowerCase()}/banking` },
+    {
+      name: "Controller",
+      dropdown: ControllerDropdown,
+    },
   ];
 
   // Find the active nav item name based on the current path
@@ -183,7 +196,7 @@ const Sidebar = () => {
   }, [location.pathname, navItems]);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen">
       {/* Sidebar */}
       <aside className="bg-black w-72 text-white fixed h-full transition-all duration-300 overflow-y-auto">
         <div className="flex justify-between items-center p-4 border-gray-700">

@@ -8,8 +8,8 @@ const AgentPrivetRoute = ({ children }) => {
   const location = useLocation();
 
   // Check if user is logged in and has role "Mother Admin"
-  if (!motherAdmin || motherAdmin.role !== "AG") {
-    return <Navigate to="/ag-login" state={{ from: location?.pathname }} />;
+  if (!motherAdmin) {
+    return <Navigate to="/ad-login" state={{ from: location?.pathname }} />;
   }
 
   return children;

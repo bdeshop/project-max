@@ -35,13 +35,11 @@ import MotherAdminLogin from "../pages/Logins/MotherAdminLogin/MotherAdminLogin"
 import CreatedAdminList from "../pages/AllAdminList/CreatedAdminList/CreatedAdminList";
 import Users from "../pages/Users/User";
 import SubAdminPrivetRoute from "../routes/SubAdminPrivetRoute";
-import SubAdminLogin from "../pages/Logins/SubAdminLogin/SubAdminLogin";
-import MasterLogin from "../pages/Logins/MasterLogin/MasterLogin";
 import MasterPrivetRoute from "../routes/MasterPrivetRoute";
-import AgentLogin from "../pages/Logins/AgentLogin/AgentLogin";
 import AgentPrivetRoute from "../routes/AgentPrivetRoute";
 import SubAgentPrivetRoute from "../routes/SubAgentPrivetRoute";
-import SubAgentLogin from "../pages/Logins/SubAgentLogin/SubAgentLogin";
+import HomeControl from "../pages/HomeControl/HomeControl";
+import ColorControl from "../pages/ColorControl/ColorControl";
 
 export const routes = createBrowserRouter([
   {
@@ -74,6 +72,22 @@ export const routes = createBrowserRouter([
         element: (
           <MotherAdminRoute>
             <MotherAdmin></MotherAdmin>
+          </MotherAdminRoute>
+        ),
+      },
+      {
+        path: "home-control",
+        element: (
+          <MotherAdminRoute>
+            <HomeControl></HomeControl>
+          </MotherAdminRoute>
+        ),
+      },
+      {
+        path: "color-control",
+        element: (
+          <MotherAdminRoute>
+            <ColorControl></ColorControl>
           </MotherAdminRoute>
         ),
       },
@@ -195,22 +209,6 @@ export const routes = createBrowserRouter([
   {
     path: "ad-login",
     element: <MotherAdminLogin></MotherAdminLogin>,
-  },
-  {
-    path: "sa-login",
-    element: <SubAdminLogin></SubAdminLogin>,
-  },
-  {
-    path: "mt-login",
-    element: <MasterLogin></MasterLogin>,
-  },
-  {
-    path: "ag-login",
-    element: <AgentLogin></AgentLogin>,
-  },
-  {
-    path: "sg-login",
-    element: <SubAgentLogin></SubAgentLogin>,
   },
   {
     path: "/sa",
@@ -455,7 +453,7 @@ export const routes = createBrowserRouter([
         path: "my-report-spinList",
         element: <PendingSpinUsers></PendingSpinUsers>,
       },
-     
+
       {
         path: "risk-management",
         element: <RiskManagement></RiskManagement>,
@@ -589,7 +587,7 @@ export const routes = createBrowserRouter([
         path: "my-report-spinList",
         element: <PendingSpinUsers></PendingSpinUsers>,
       },
-      
+
       {
         path: "risk-management",
         element: <RiskManagement></RiskManagement>,

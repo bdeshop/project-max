@@ -20,6 +20,13 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 15;
+  const [selectedAdminId, setSelectedAdminId] = useState(null);
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [statusForm, setStatusForm] = useState({
+    adminId: "",
+    status: "Active",
+    password: "",
+  });
 
   const { motherAdmin } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -73,7 +80,7 @@ const Users = () => {
         `${import.meta.env.VITE_API_URL}/api/admins`,
         {
           ...formData,
-          role: "US", // Explicitly set role to "US" for users
+          role: "US",
           createdBy: motherAdmin?._id || null,
         }
       );
@@ -96,7 +103,34 @@ const Users = () => {
     }
   };
 
-  // Pagination logic
+  const handleStatusChange = (e) => {
+    setStatusForm({ ...statusForm, [e.target.name]: e.target.value });
+  };
+
+  const openStatusModal = (adminId) => {
+    setSelectedAdminId(adminId);
+    setStatusForm({ adminId, status: "Active", password: "" });
+    setStatusModalOpen(true);
+  };
+
+  const submitStatusChange = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/admins/change-status`,
+        statusForm
+      );
+      if (res.data.success) {
+        toast.success("✅ Status changed successfully!");
+        setStatusModalOpen(false);
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error("Error changing status:", error);
+      toast.error("❌ Failed to change status");
+    }
+  };
+
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
@@ -109,7 +143,6 @@ const Users = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  // Calculate totals for current page
   const totals = currentUsers.reduce(
     (acc, u) => {
       acc.credit += u.credit || 0;
@@ -142,7 +175,6 @@ const Users = () => {
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
-      {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center space-x-2">
           <input
@@ -176,7 +208,6 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Summary Section */}
       <div className="flex bg-[#f5f6f8] border-b mb-5 overflow-hidden">
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Total Balance</p>
@@ -202,7 +233,6 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Table Section */}
       <div className="bg-white rounded shadow overflow-hidden">
         <table className="w-full border-collapse">
           <thead className="bg-[#1f3349] text-white">
@@ -257,7 +287,13 @@ const Users = () => {
               >
                 <td className="p-2 flex items-center space-x-1">
                   <span
-                    onClick={() => navigate(`/${motherAdmin.role.toLowerCase()}/created-admins/${u._id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/${motherAdmin.role.toLowerCase()}/created-admins/${
+                          u._id
+                        }`
+                      )
+                    }
                     className="bg-red-200 font-bold text-red-800 text-xs px-2 py-1 rounded-[4px] cursor-pointer hover:bg-red-300 transition"
                   >
                     {u.role}
@@ -286,13 +322,26 @@ const Users = () => {
                   {u.refPL?.toLocaleString()}
                 </td>
                 <td className="p-2 text-center">
-                  <span className="text-green-700 bg-green-100 px-2 py-0.5 rounded-sm font-bold">
+                  <span
+                    className={`px-2 py-0.5 rounded-sm font-bold ${
+                      u.status === "Active"
+                        ? "bg-green-100 text-green-700"
+                        : u.status === "Suspend"
+                        ? "bg-red-100 text-red-700"
+                        : u.status === "Locked"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-gray-100 text-gray-700" // default fallback
+                    }`}
+                  >
                     ● {u.status}
                   </span>
                 </td>
                 <td className="p-2 text-center">
                   <div className="flex justify-center space-x-2">
-                    <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
+                    <button
+                      className="p-2 border rounded bg-yellow-50 hover:cursor-pointer"
+                      onClick={() => openStatusModal(u._id)}
+                    >
                       <FaCog size={16} />
                     </button>
                     <button className="p-2 border rounded bg-yellow-50 hover:cursor-pointer">
@@ -305,8 +354,6 @@ const Users = () => {
                 </td>
               </tr>
             ))}
-
-            {/* Totals Row */}
             <tr className="bg-[#FFEDD5] border-t font-semibold">
               <td className="p-2">Total (Page {currentPage})</td>
               <td className="p-2 text-right">
@@ -336,7 +383,6 @@ const Users = () => {
           </tbody>
         </table>
 
-        {/* Pagination */}
         <div className="flex items-center justify-center p-3 border-t border-b border-dashed text-sm mt-4">
           <button
             onClick={prevPage}
@@ -357,7 +403,6 @@ const Users = () => {
           </button>
         </div>
 
-        {/* Bottom Menu */}
         <div className="flex flex-wrap justify-end mr-8 items-center gap-3 py-2 bg-white border-t border-gray-300">
           {menuItems.map((item, index) => (
             <React.Fragment key={index}>
@@ -372,7 +417,6 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Add User Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-xl">
           <div className="bg-white shadow-lg w-1/2 rounded-2xl">
@@ -390,7 +434,6 @@ const Users = () => {
             </div>
             <div className="p-4">
               <h4 className="text-lg font-bold mb-2">Personal Information</h4>
-
               <form
                 className="max-w-4xl mx-auto bg-white p-8 rounded-lg"
                 onSubmit={handleSubmit}
@@ -412,7 +455,6 @@ const Users = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Password
@@ -428,7 +470,6 @@ const Users = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         First Name
@@ -445,7 +486,6 @@ const Users = () => {
                       <span className="text-red-600">*</span>
                     </div>
                   </div>
-
                   <div>
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -462,7 +502,6 @@ const Users = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Phone
@@ -478,7 +517,6 @@ const Users = () => {
                       />
                       <span className="text-red-600">*</span>
                     </div>
-
                     <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         TimeZone
@@ -500,7 +538,6 @@ const Users = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="flex justify-end">
                   <button
                     type="submit"
@@ -511,6 +548,98 @@ const Users = () => {
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+
+      {statusModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-xl">
+          <div className="bg-white shadow-lg w-1/3 rounded-2xl">
+            <div className="bg-red-600 text-white p-2 flex justify-between items-center rounded-tl-xl rounded-tr-xl">
+              <h3 className="text-lg font-bold">Change Status</h3>
+              <button
+                onClick={() => setStatusModalOpen(false)}
+                className="text-white cursor-pointer hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={submitStatusChange} className="p-4">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  AD
+                </label>
+                <input
+                  type="text"
+                  value={selectedAdminId || ""}
+                  disabled
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                />
+              </div>
+              <div className="mb-4 flex justify-center space-x-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Active" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Active"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
+                >
+                  <span className="text-green-600">✔</span> Active
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Suspend" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Suspend"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
+                >
+                  <span className="text-red-600">✖</span> Suspend
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setStatusForm({ ...statusForm, status: "Locked" })
+                  }
+                  className={`p-2 border rounded cursor-pointer ${
+                    statusForm.status === "Locked"
+                      ? "bg-gray-300"
+                      : "bg-yellow-50"
+                  }`}
+                >
+                  <span className="text-gray-600">🔒</span> Locked
+                </button>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={statusForm.password}
+                  onChange={handleStatusChange}
+                  placeholder="Enter password"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="bg-red-600 cursor-pointer text-white px-6 py-2 rounded hover:bg-red-700 transition"
+                >
+                  Change
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
