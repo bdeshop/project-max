@@ -1,6 +1,6 @@
 import express from "express";
 import Admin from "../models/Admin.js";
-import Transaction from "../models/Transaction.js" // Import Transaction model
+import Transaction from "../models/Transaction.js"; // Import Transaction model
 const router = express.Router();
 
 // Create admin
@@ -11,18 +11,31 @@ router.post("/", async (req, res) => {
 
     // Ensure required fields are present (simple validation)
     if (!payload.username || !payload.password || !payload.firstName) {
-      return res.status(400).json({ success: false, message: "Missing required fields" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
     }
 
     const newAdmin = new Admin(payload);
     await newAdmin.save();
-    res.status(201).json({ success: true, message: "Admin added successfully!", admin: newAdmin });
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "Admin added successfully!",
+        admin: newAdmin,
+      });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ success: false, message: "Failed to add admin", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to add admin",
+        error: error.message,
+      });
   }
 });
-
 
 // Get all admins
 router.get("/", async (req, res) => {
@@ -34,20 +47,21 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 // Get admins created by a specific admin
 router.get("/created/:creatorId", async (req, res) => {
   try {
     const { creatorId } = req.params;
-    const subs = await Admin.find({ createdBy: creatorId }).sort({ createdAt: -1 });
+    const subs = await Admin.find({ createdBy: creatorId }).sort({
+      createdAt: -1,
+    });
     res.status(200).json(subs);
   } catch (error) {
     console.error("Fetch created admins error:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch created admins" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch created admins" });
   }
 });
-
-
 
 // 🔐 Mother Admin LOGIN API
 router.post("/ad-login", async (req, res) => {
@@ -60,89 +74,10 @@ router.post("/ad-login", async (req, res) => {
     if (user.password !== password)
       return res.status(401).json({ message: "Invalid credentials!" });
 
-    if (user.role !== "MA")
+    const allowedRoles = ["MA", "SA", "MT", "AG", "SG"];
+    if (!allowedRoles.includes(user.role)) {
       return res.status(401).json({ message: "Not authorized!" });
-
-    user.updatedAt = new Date();
-    await user.save();
-
-    res.status(200).json({
-      message: "Login successful",
-      user,
-    });
-  } catch (error) {
-    console.error("🔥 Login Error:", error.message);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-// 🔐 Sub Admin LOGIN API
-router.post("/as-login", async (req, res) => {
-  try {
-    const { userName, password } = req.body;
-
-    const user = await Admin.findOne({ username: userName });
-    if (!user) return res.status(404).json({ message: "User not found!" });
-
-    if (user.password !== password)
-      return res.status(401).json({ message: "Invalid credentials!" });
-
-    if (user.role !== "SA")
-      return res.status(401).json({ message: "Not authorized!" });
-
-    user.updatedAt = new Date();
-    await user.save();
-
-    res.status(200).json({
-      message: "Login successful",
-      user,
-    });
-  } catch (error) {
-    console.error("🔥 Login Error:", error.message);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-// Master Login
-router.post("/mt-login", async (req, res) => {
-  try {
-    const { userName, password } = req.body;
-
-    const user = await Admin.findOne({ username: userName });
-    if (!user) return res.status(404).json({ message: "User not found!" });
-
-    if (user.password !== password)
-      return res.status(401).json({ message: "Invalid credentials!" });
-
-    if (user.role !== "MT")
-      return res.status(401).json({ message: "Not authorized!" });
-
-    user.updatedAt = new Date();
-    await user.save();
-
-    res.status(200).json({
-      message: "Login successful",
-      user,
-    });
-  } catch (error) {
-    console.error("🔥 Login Error:", error.message);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-// Agent Login
-router.post("/ag-login", async (req, res) => {
-  try {
-    const { userName, password } = req.body;
-
-    const user = await Admin.findOne({ username: userName });
-    if (!user) return res.status(404).json({ message: "User not found!" });
-
-    if (user.password !== password)
-      return res.status(401).json({ message: "Invalid credentials!" });
-
-    if (user.role !== "AG")
-      return res.status(401).json({ message: "Not authorized!" });
+    }
 
     user.updatedAt = new Date();
     await user.save();
@@ -158,8 +93,8 @@ router.post("/ag-login", async (req, res) => {
 });
 
 
-// Sub Agent Login
-router.post("/sg-login", async (req, res) => {
+// 🔐 user Admin LOGIN API
+router.post("/user-login", async (req, res) => {
   try {
     const { userName, password } = req.body;
 
@@ -169,8 +104,10 @@ router.post("/sg-login", async (req, res) => {
     if (user.password !== password)
       return res.status(401).json({ message: "Invalid credentials!" });
 
-    if (user.role !== "SG")
+    const allowedRoles = ["US"];
+    if (!allowedRoles.includes(user.role)) {
       return res.status(401).json({ message: "Not authorized!" });
+    }
 
     user.updatedAt = new Date();
     await user.save();
@@ -181,6 +118,43 @@ router.post("/sg-login", async (req, res) => {
     });
   } catch (error) {
     console.error("🔥 Login Error:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+
+// user profile update 
+// 🔐 Update User Profile (without bcrypt)
+router.put("/update-profile/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstName, lastName, email, number, password } = req.body;
+
+    // Find user by id
+    const user = await Admin.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found!" });
+
+    // Update fields
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.email = email || user.email;
+    user.number = number || user.number;
+
+    // Update password directly if provided
+    if (password && password.trim() !== "") {
+      user.password = password;
+    }
+
+    user.updatedAt = new Date();
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+      modifiedCount: 1,
+    });
+  } catch (error) {
+    console.error("🔥 Update Profile Error:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
@@ -197,14 +171,19 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
 // Transaction API - DEPOSIT/WITHDRAW with history logging
 router.post("/transaction", async (req, res) => {
   try {
     const { fromAdminId, toAdminIds, amount, type } = req.body;
 
     // Validation
-    if (!fromAdminId || !toAdminIds || !Array.isArray(toAdminIds) || !amount || amount <= 0) {
+    if (
+      !fromAdminId ||
+      !toAdminIds ||
+      !Array.isArray(toAdminIds) ||
+      !amount ||
+      amount <= 0
+    ) {
       return res.status(400).json({ message: "Invalid transaction data" });
     }
 
@@ -215,11 +194,14 @@ router.post("/transaction", async (req, res) => {
 
     const toAdmins = await Admin.find({ _id: { $in: toAdminIds } });
     if (toAdmins.length !== toAdminIds.length) {
-      return res.status(404).json({ message: "One or more target admins not found" });
+      return res
+        .status(404)
+        .json({ message: "One or more target admins not found" });
     }
 
     // Get IP address
-    const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || "-";
+    const ipAddress =
+      req.ip || req.connection.remoteAddress || req.socket.remoteAddress || "-";
 
     // Process transaction based on type
     let fromAdminBalance = fromAdmin.balance;
@@ -232,7 +214,7 @@ router.post("/transaction", async (req, res) => {
         return res.status(400).json({ message: "Insufficient balance" });
       }
       fromAdminBalance -= totalAmount;
-      
+
       // Update from admin balance
       fromAdmin.balance = fromAdminBalance;
       await fromAdmin.save();
@@ -242,7 +224,7 @@ router.post("/transaction", async (req, res) => {
         const toAdmin = toAdmins[i];
         const newToAdminBalance = (toAdmin.balance || 0) + amount;
         updatedToAdminBalances[toAdmin._id] = newToAdminBalance;
-        
+
         // Update to admin balance
         toAdmin.balance = newToAdminBalance;
         await toAdmin.save();
@@ -286,11 +268,13 @@ router.post("/transaction", async (req, res) => {
       for (let i = 0; i < toAdmins.length; i++) {
         const toAdmin = toAdmins[i];
         if ((toAdmin.balance || 0) < amount) {
-          return res.status(400).json({ message: `Insufficient balance in ${toAdmin.username}` });
+          return res
+            .status(400)
+            .json({ message: `Insufficient balance in ${toAdmin.username}` });
         }
         updatedToAdminBalances[toAdmin._id] = (toAdmin.balance || 0) - amount;
       }
-      
+
       // Update from admin balance (add total withdrawn amount)
       fromAdminBalance += amount * toAdminIds.length;
       fromAdmin.balance = fromAdminBalance;
@@ -300,7 +284,7 @@ router.post("/transaction", async (req, res) => {
       for (let i = 0; i < toAdmins.length; i++) {
         const toAdmin = toAdmins[i];
         const newToAdminBalance = updatedToAdminBalances[toAdmin._id];
-        
+
         // Update to admin balance
         toAdmin.balance = newToAdminBalance;
         await toAdmin.save();
@@ -342,7 +326,9 @@ router.post("/transaction", async (req, res) => {
     }
 
     res.json({
-      message: `Successfully ${type === "D" ? "deposited" : "withdrawn"} ${amount} to ${toAdminIds.length} admin(s)`,
+      message: `Successfully ${
+        type === "D" ? "deposited" : "withdrawn"
+      } ${amount} to ${toAdminIds.length} admin(s)`,
       fromAdminBalance: fromAdminBalance,
       toAdminBalances: updatedToAdminBalances,
     });
@@ -357,13 +343,10 @@ router.get("/transaction-history/:adminId", async (req, res) => {
   try {
     const { adminId } = req.params;
     const { page = 1, limit = 10, fromDate, toDate } = req.query;
-    
+
     // Build query
-    let query = { 
-      $or: [
-        { fromAdminId: adminId },
-        { toAdminId: adminId }
-      ]
+    let query = {
+      $or: [{ fromAdminId: adminId }, { toAdminId: adminId }],
     };
 
     // Date filtering
@@ -385,23 +368,31 @@ router.get("/transaction-history/:adminId", async (req, res) => {
       .populate("fromAdminId toAdminId performedBy");
 
     // Transform data for frontend
-    const transformedData = transactions.map(transaction => ({
-      datetime: transaction.datetime.toLocaleString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
+    const transformedData = transactions.map((transaction) => ({
+      datetime: transaction.datetime.toLocaleString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
       }),
-      depositUpline: transaction.transactionType === "depositUpline" ? 
-        `${transaction.amount.toFixed(2)}` : "-",
-      depositDownline: transaction.transactionType === "depositDownline" ? 
-        `${transaction.amount.toFixed(2)}` : "-",
-      withdrawUpline: transaction.transactionType === "withdrawUpline" ? 
-        `${transaction.amount.toFixed(2)}` : "-",
-      withdrawDownline: transaction.transactionType === "withdrawDownline" ? 
-        `${transaction.amount.toFixed(2)}` : "-",
+      depositUpline:
+        transaction.transactionType === "depositUpline"
+          ? `${transaction.amount.toFixed(2)}`
+          : "-",
+      depositDownline:
+        transaction.transactionType === "depositDownline"
+          ? `${transaction.amount.toFixed(2)}`
+          : "-",
+      withdrawUpline:
+        transaction.transactionType === "withdrawUpline"
+          ? `${transaction.amount.toFixed(2)}`
+          : "-",
+      withdrawDownline:
+        transaction.transactionType === "withdrawDownline"
+          ? `${transaction.amount.toFixed(2)}`
+          : "-",
       balance: transaction.balance.toFixed(2),
       remark: transaction.remark,
       fromto: transaction.fromTo,
@@ -416,22 +407,38 @@ router.get("/transaction-history/:adminId", async (req, res) => {
           _id: null,
           totalDepositUpline: {
             $sum: {
-              $cond: [{ $eq: ["$transactionType", "depositUpline"] }, "$amount", 0],
+              $cond: [
+                { $eq: ["$transactionType", "depositUpline"] },
+                "$amount",
+                0,
+              ],
             },
           },
           totalDepositDownline: {
             $sum: {
-              $cond: [{ $eq: ["$transactionType", "depositDownline"] }, "$amount", 0],
+              $cond: [
+                { $eq: ["$transactionType", "depositDownline"] },
+                "$amount",
+                0,
+              ],
             },
           },
           totalWithdrawUpline: {
             $sum: {
-              $cond: [{ $eq: ["$transactionType", "withdrawUpline"] }, "$amount", 0],
+              $cond: [
+                { $eq: ["$transactionType", "withdrawUpline"] },
+                "$amount",
+                0,
+              ],
             },
           },
           totalWithdrawDownline: {
             $sum: {
-              $cond: [{ $eq: ["$transactionType", "withdrawDownline"] }, "$amount", 0],
+              $cond: [
+                { $eq: ["$transactionType", "withdrawDownline"] },
+                "$amount",
+                0,
+              ],
             },
           },
         },
@@ -481,14 +488,18 @@ router.post("/change-password", async (req, res) => {
 
     // Validate new password (basic validation)
     if (newPassword.length < 6) {
-      return res.status(400).json({ message: "New password must be at least 6 characters" });
+      return res
+        .status(400)
+        .json({ message: "New password must be at least 6 characters" });
     }
 
     // Update password
     admin.password = newPassword;
     await admin.save();
 
-    res.status(200).json({ message: "Password changed successfully. Please login again." });
+    res
+      .status(200)
+      .json({ message: "Password changed successfully. Please login again." });
   } catch (error) {
     console.error("Password change error:", error);
     res.status(500).json({ message: "Server error while changing password" });
@@ -503,22 +514,34 @@ router.post("/change-status", async (req, res) => {
     // Find admin by ID
     const admin = await Admin.findById(adminId);
     if (!admin) {
-      return res.status(404).json({ success: false, message: "Admin not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin not found" });
     }
 
     // Verify password
     if (admin.password !== password) {
-      return res.status(401).json({ success: false, message: "Invalid password" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid password" });
     }
 
     // Update status
     admin.status = status;
     await admin.save();
 
-    res.status(200).json({ success: true, message: "Status changed successfully", admin });
+    res
+      .status(200)
+      .json({ success: true, message: "Status changed successfully", admin });
   } catch (error) {
     console.error("Error changing status:", error);
-    res.status(500).json({ success: false, message: "Failed to change status", error: error.message });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to change status",
+        error: error.message,
+      });
   }
 });
 
