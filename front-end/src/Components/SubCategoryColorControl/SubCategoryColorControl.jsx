@@ -12,15 +12,19 @@ const SubCategoryColorControl = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/webmenu")
+      .get(`${import.meta.env.VITE_API_URL}/api/subcategory`)
       .then((res) => {
         const data = res.data;
         setWebMenuBgColor(data.webMenuBgColor || "#ffffff");
         setWebMenuTextColor(data.webMenuTextColor || "#000000");
         setWebMenuFontSize(data.webMenuFontSize || 16);
         setWebMenuHoverColor(data.webMenuHoverColor || "#cccccc");
+        setWebMenuHoverTextColor(data.webMenuHoverTextColor || "#cccccc");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        toast.error("Failed to fetch subcategory settings!");
+      });
   }, []);
 
   const handleSubmit = async (e) => {
@@ -28,24 +32,25 @@ const SubCategoryColorControl = () => {
     if (!isEditing) return;
 
     try {
-      await axios.post("http://localhost:5000/api/webmenu", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/subcategory`, {
         webMenuBgColor,
         webMenuTextColor,
         webMenuFontSize: Number(webMenuFontSize),
         webMenuHoverColor,
+        webMenuHoverTextColor,
       });
-      toast.success("Web Menu settings saved!");
+      toast.success("Subcategory settings saved!");
       setIsEditing(false);
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to save web menu settings!");
+      console.error("Save error:", err);
+      toast.error("Failed to save subcategory settings!");
     }
   };
 
   return (
     <div className="max-w-sm mx-auto mt-10 p-6 bg-white rounded shadow">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-yellow-600">
+        <h2 className="text-xl font-semibold text-red-500">
           Home page subcategory select color control
         </h2>
         <button
@@ -142,7 +147,8 @@ const SubCategoryColorControl = () => {
             />
           </div>
         </div>
-        {/* Web Menu Hover Color */}
+
+        {/* Web Menu Hover Text Color */}
         <div>
           <label className="block mb-1 font-medium">
             Web Menu Hover Text Color:
@@ -164,12 +170,13 @@ const SubCategoryColorControl = () => {
             />
           </div>
         </div>
+
         {/* Apply Button */}
         <button
           type="submit"
           className={`w-full py-2 rounded text-white font-semibold mt-2 ${
             isEditing
-              ? "bg-yellow-500 hover:bg-yellow-600"
+              ? "bg-red-500 hover:bg-red-600"
               : "bg-gray-400 cursor-not-allowed"
           }`}
           disabled={!isEditing}

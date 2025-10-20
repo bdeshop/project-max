@@ -1,29 +1,30 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaTimes } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { AuthContext } from "../../context/AuthContext";
-
 
 const FavAndTitleControl = () => {
-  const { id, setId } = useContext(AuthContext);
   const [title, setTitle] = useState("");
   const [favicon, setFavicon] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [id, setId] = useState(null); // Local state for ID
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  // Fetch settings
+  // ✅ সেটিংস ফেচ
   const fetchSettings = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/settings");
-      if (data) {
-        setTitle(data.title || "");
-        setFavicon(data.faviconUrl || null);
-        if (data._id) setId(data._id);
+      console.log("Fetching settings from:", `${import.meta.env.VITE_API_URL}/api/settings`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/settings`);
+      console.log("Response data:", res.data);
+      if (res.data) {
+        setTitle(res.data.title || "");
+        setFavicon(res.data.faviconUrl || null);
+        if (res.data._id) setId(res.data._id); // Set ID from response
       }
     } catch (err) {
-      console.error("Error fetching settings:", err);
+      console.error("Fetch error details:", err.response ? err.response.data : err.message);
+      toast.error("Failed to fetch settings");
     }
   };
 
@@ -31,13 +32,17 @@ const FavAndTitleControl = () => {
     fetchSettings();
   }, []);
 
-  // File select
+  // ✅ ফাইল সিলেক্ট
   const handleChange = (e) => {
     const file = e.target.files[0];
-    if (file) setPreview(URL.createObjectURL(file));
+    if (file && file.type.startsWith("image/")) {
+      setPreview(URL.createObjectURL(file));
+    } else {
+      toast.error("Please select a valid image file");
+    }
   };
 
-  // Upload
+  // ✅ আপলোড
   const handleUpload = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -47,61 +52,79 @@ const FavAndTitleControl = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/settings", formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/settings`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      toast.success("Settings updated!");
+      toast.success("Settings updated successfully!");
       setIsModalOpen(false);
+      setPreview(null);
       fetchSettings();
     } catch (err) {
       console.error("Upload error:", err);
+      toast.error("Failed to update settings");
     }
   };
 
-  // Delete Favicon
+  // ✅ ফ্যাভিকন ডিলিট
   const handleDeleteFavicon = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/settings/favicon/${id}`);
-      toast.error("Favicon deleted!");
+      if (!id) {
+        toast.error("No settings ID available");
+        return;
+      }
+      console.log("Deleting favicon with ID:", id);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/settings/favicon/${id}`);
+      toast.success("Favicon deleted successfully!");
       fetchSettings();
       setIsDeleteModalOpen(false);
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error("Delete error:", err.response ? err.response.data : err.message);
+      toast.error(`Failed to delete favicon: ${err.response?.data?.message || err.message}`);
     }
   };
 
+  // ক্লিনআপ প্রিভিউ URL
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
   return (
     <div className="bg-[#e4d9c8]">
-     
-      {/* Top bar */}
-      <div className="bg-black text-white p-2 lg:px-16 flex justify-between items-center">
-        <h2 className="font-semibold">Title & Favicon Control</h2>
+      {/* Upload Section */}
+      <div className="bg-black text-white p-4 flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Title & Favicon Control</h2>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-[#e3ac08] text-black px-3 py-1 rounded-sm text-sm hover:bg-yellow-700"
+          className="bg-red-500 cursor-pointer text-white px-4 py-2 rounded-sm text-sm font-medium hover:bg-red-600 transition-colors"
         >
           + Edit
         </button>
       </div>
 
       {/* Preview */}
-      <div className="p-5 lg:px-16">
+      <div className="p-5">
         <h3 className="font-semibold mb-2">Website Title:</h3>
-        <p className="border p-2">{title || "No title set"}</p>
+        <p className="border p-2 rounded-md">{title || "No title set"}</p>
 
         <h3 className="font-semibold mt-4 mb-2">Favicon:</h3>
         {favicon ? (
           <div className="relative inline-block">
             <button
               onClick={() => setIsDeleteModalOpen(true)}
-              className="absolute -top-2 -right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700"
+              className="absolute cursor-pointer -top-2 -right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition-colors"
+              aria-label="Delete favicon"
             >
               <FaTimes />
             </button>
             <img
-              src={favicon}
+              src={`${import.meta.env.VITE_API_URL}${favicon}`}
               alt="Favicon"
-              className="w-16 h-16 border p-2 object-contain"
+              className="w-16 h-16 border p-2 object-contain rounded-md"
+              onError={() => toast.error("Failed to load favicon")}
             />
           </div>
         ) : (
@@ -114,8 +137,12 @@ const FavAndTitleControl = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-md shadow-lg w-[400px] relative p-6">
             <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded"
+              onClick={() => {
+                setIsModalOpen(false);
+                setPreview(null);
+              }}
+              className="absolute cursor-pointer top-2 right-2 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors"
+              aria-label="Close modal"
             >
               <FaTimes />
             </button>
@@ -126,23 +153,29 @@ const FavAndTitleControl = () => {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full border p-2 mb-4"
+                className="w-full border p-2 mb-4 rounded-md"
               />
 
               <label className="block mb-2 font-semibold">Upload Favicon</label>
-              <input type="file" name="favicon" accept="image/*" />
+              <input
+                type="file"
+                name="favicon"
+                accept="image/*"
+                onChange={handleChange}
+                className="mb-2"
+              />
               {preview && (
                 <img
                   src={preview}
-                  alt="preview"
-                  className="w-16 h-16 border mt-2"
+                  alt="Preview"
+                  className="w-16 h-16 border mt-2 rounded-md"
                 />
               )}
 
               <div className="flex justify-end mt-4">
                 <button
                   type="submit"
-                  className="bg-gray-700 text-white px-5 py-2 rounded hover:bg-gray-800"
+                  className="bg-gray-700 cursor-pointer text-white px-5 py-2 rounded hover:bg-gray-800 transition-colors"
                 >
                   Save
                 </button>
@@ -151,24 +184,24 @@ const FavAndTitleControl = () => {
           </div>
         </div>
       )}
-      {/* Delete Modal */}
 
+      {/* Delete Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-md shadow-lg w-[350px] p-6 relative">
+          <div className="bg-white rounded-md shadow-lg w-[350px] p-6">
             <h2 className="text-lg font-semibold mb-4 text-center">
-              Are you sure you want to delete?
+              Are you sure you want to delete the favicon?
             </h2>
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleDeleteFavicon}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 hover:cursor-pointer"
+                className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
               >
                 Yes, Delete
               </button>
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
-                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 hover:cursor-pointer"
+                className="bg-gray-300 cursor-pointer text-black px-4 py-2 rounded hover:bg-gray-400 transition-colors"
               >
                 Cancel
               </button>

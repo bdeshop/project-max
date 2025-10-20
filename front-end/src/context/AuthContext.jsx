@@ -7,6 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [motherAdmin, setMotherAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState(0);
+  const [logo, setLogo] = useState(null); // নতুন: লোগো পাথ স্টোর
+  const [logoId, setLogoId] = useState(null); // নতুন: লোগোর MongoDB _id
 
   // --- ✅ Balance Fetch Function
   const fetchBalance = async (adminId) => {
@@ -20,14 +22,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // --- ✅ Logo Fetch Function
+  const fetchLogo = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/logo`
+      );
+      setLogo(response.data ? response.data.path : null);
+      setLogoId(response.data ? response.data._id : null);
+      console.log(response.data ? response.data.path : null);
+    } catch (error) {
+      console.error("Error fetching logo:", error);
+    }
+  };
+
   // --- ✅ Reload Function
   const reload = async () => {
     if (motherAdmin && motherAdmin._id) {
       await fetchBalance(motherAdmin._id);
-      
     }
   };
 
+  // প্রাথমিক লোড: অ্যাডমিন এবং লোগো ফেচ
   useEffect(() => {
     const storedUser = localStorage.getItem("motherAdmin");
     if (storedUser) {
@@ -37,9 +53,11 @@ export const AuthProvider = ({ children }) => {
         fetchBalance(userData._id);
       }
     }
+    fetchLogo(); // লোগো ফেচ করা
     setLoading(false);
   }, []);
 
+  // ব্যালেন্স রিফ্রেশ (প্রতি ৫ সেকেন্ডে)
   useEffect(() => {
     let intervalId;
     if (motherAdmin && motherAdmin._id) {
@@ -69,7 +87,19 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ motherAdmin, balance, setMotherAdmin, login, logout, reload }}
+      value={{
+        motherAdmin,
+        balance,
+        setMotherAdmin,
+        login,
+        logout,
+        reload,
+        logo, // নতুন: লোগো পাথ
+        logoId, // নতুন: লোগো আইডি
+        setLogo, // নতুন: লোগো সেটার
+        setLogoId, // নতুন: লোগো আইডি সেটার
+        fetchLogo, // নতুন: লোগো ফেচ ফাংশন
+      }}
     >
       {children}
     </AuthContext.Provider>

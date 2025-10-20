@@ -13,7 +13,12 @@ import TennisBanner from "../../Components/TennisBanner/TennisBanner";
 const HomeControl = () => {
   return (
     <div className="space-y-7">
-      <LogoControl></LogoControl>
+        {/* Header */}
+      <div className="bg-red-500 text-center py-4 text-white font-bold text-xl">
+        Home Control
+      </div>
+
+      <LogoControl></LogoControl>    
       <SliderControl></SliderControl>
       <FavAndTitleControl></FavAndTitleControl>
       <NoticeControl></NoticeControl>
