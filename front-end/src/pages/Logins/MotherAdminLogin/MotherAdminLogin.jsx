@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -9,6 +9,7 @@ const MotherAdminLogin = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [validationInput, setValidationInput] = useState("");
+  const [adminImage, setAdminImage] = useState(null);
   const [code, setCode] = useState(generateCode());
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -17,6 +18,25 @@ const MotherAdminLogin = () => {
   function generateCode() {
     return Math.floor(1000 + Math.random() * 9000);
   }
+
+  // ✅ অ্যাডমিন ইমেজ ডাটা ফেচ
+  const fetchAdminImage = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin-login-image/admin`);
+      if (res.data && res.data.loginImageUrl) {
+        // ✅ Make sure it has full URL
+        const fullImageUrl = `${import.meta.env.VITE_API_URL}${res.data.loginImageUrl}`;
+        setAdminImage(fullImageUrl);
+        console.log("✅ Admin Image URL:", fullImageUrl);
+      }
+    } catch (err) {
+      console.error("Error fetching admin image:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminImage();
+  }, []);
 
   // 🔁 Refresh code
   const handleRefresh = () => setCode(generateCode());
@@ -62,20 +82,22 @@ const MotherAdminLogin = () => {
       className="min-h-screen flex justify-center items-center bg-cover bg-center relative"
       style={{
         backgroundImage:
-          "url('https://i.ibb.co.com/bMktQGPC/wp2793078.jpg')", // 🔥 Replace with your background image
+          "url('https://i.ibb.co.com/bMktQGPC/wp2793078.jpg')",
       }}
     >
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
       {/* Login Box */}
-      <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-20 p-10  rounded-lg w-[90%] max-w-md">
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-20 p-10 rounded-lg w-[90%] max-w-md">
         {/* Logo */}
-        <img
-          src="https://i.ibb.co/hYsp1w8/enjoy-logo.png"
-          alt="Logo"
-          className="w-40 mb-4"
-        />
+        {adminImage && (
+          <img
+            src={adminImage}
+            alt="Logo"
+            className="w-40 mb-4"
+          />
+        )}
 
         {/* Form */}
         <div className="w-full border-l-2 border-white pl-6">
