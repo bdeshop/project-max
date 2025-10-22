@@ -91,6 +91,7 @@ const Users = () => {
           username: "",
           password: "",
           firstName: "",
+          reffer:" ",
           lastName: "",
           phone: "",
           timeZone: "Asia/Dhaka",
@@ -484,6 +485,20 @@ const Users = () => {
                         required
                       />
                       <span className="text-red-600">*</span>
+                    </div>
+                    <div className="mb-4 flex justify-center items-center gap-4 text-nowrap">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Reffer Code
+                      </label>
+                      <input
+                        type="text"
+                        name="reffer"
+                        value={formData.reffer}
+                        onChange={handleChange}
+                        placeholder="Reffer Code (Optional)"
+                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
+                      />
+
                     </div>
                   </div>
                   <div>

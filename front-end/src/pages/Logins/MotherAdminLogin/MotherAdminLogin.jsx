@@ -22,7 +22,7 @@ const MotherAdminLogin = () => {
   // ✅ অ্যাডমিন ইমেজ ডাটা ফেচ
   const fetchAdminImage = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin-login-image/admin`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin-login-image`);
       if (res.data && res.data.loginImageUrl) {
         // ✅ Make sure it has full URL
         const fullImageUrl = `${import.meta.env.VITE_API_URL}${res.data.loginImageUrl}`;

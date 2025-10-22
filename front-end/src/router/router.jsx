@@ -207,7 +207,7 @@ export const routes = createBrowserRouter([
     ],
   },
   {
-    path: "ad-login",
+    path: "ag",
     element: <MotherAdminLogin></MotherAdminLogin>,
   },
   {

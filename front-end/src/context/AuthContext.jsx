@@ -90,6 +90,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         motherAdmin,
         balance,
+        setBalance,
         setMotherAdmin,
         login,
         logout,

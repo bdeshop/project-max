@@ -14,9 +14,10 @@ const AdminImageControl = () => {
   // ✅ অ্যাডমিন ইমেজ ডাটা ফেচ
   const fetchAdminImage = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin-login-image/admin`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin-login-image`);
       if (res.data && res.data.loginImageUrl) {
         setAdminImage(res.data.loginImageUrl);
+        console.log(res.data.loginImageUrl);
         setId(res.data._id);
       }
     } catch (err) {
@@ -51,7 +52,7 @@ const AdminImageControl = () => {
     formData.append("loginImage", file);
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/admin-login-image/admin`, formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/admin-login-image`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Admin image uploaded successfully!");
@@ -73,7 +74,7 @@ const AdminImageControl = () => {
     }
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin-login-image/admin/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin-login-image/${id}`);
       toast.success("Admin image deleted successfully!");
       setIsDeleteModalOpen(false);
       setAdminImage(null);

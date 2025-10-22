@@ -15,7 +15,7 @@ const LoginImageControl = () => {
   // ✅ লগইন ইমেজ ডাটা ফেচ
   const fetchLoginImage = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin-login-image`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/login-image`);
       if (res.data && res.data.loginImageUrl) {
         setLoginImage(res.data.loginImageUrl);
         setId(res.data._id);
@@ -52,7 +52,7 @@ const LoginImageControl = () => {
     formData.append("loginImage", file);
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/admin-login-image`, formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/login-image`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Login image uploaded successfully!");
@@ -74,7 +74,7 @@ const LoginImageControl = () => {
     }
 
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin-login-image/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/login-image/${id}`);
       toast.success("Login image deleted successfully!");
       setIsDeleteModalOpen(false);
       setLoginImage(null);

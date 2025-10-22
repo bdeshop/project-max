@@ -9,7 +9,7 @@ const SubAgentPrivetRoute = ({ children }) => {
 
   // Check if user is logged in and has role "Mother Admin"
   if (!motherAdmin) {
-    return <Navigate to="/ad-login" state={{ from: location?.pathname }} />;
+    return <Navigate to="/ag" state={{ from: location?.pathname }} />;
   }
 
   return children;
