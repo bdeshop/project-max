@@ -18,22 +18,62 @@ router.post("/", async (req, res) => {
 
     const newAdmin = new Admin(payload);
     await newAdmin.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Admin added successfully!",
-        admin: newAdmin,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Admin added successfully!",
+      admin: newAdmin,
+    });
   } catch (error) {
     console.error("Error:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to add admin",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to add admin",
+      error: error.message,
+    });
+  }
+});
+
+// Register User
+
+router.post("/user", async (req, res) => {
+  try {
+    const payload = req.body;
+
+    // ✅ ভ্যালিডেশন
+    if (
+      !payload.username ||
+      !payload.password ||
+      !payload.firstName ||
+      !payload.lastName ||
+      !payload.phone ||
+      !payload.email
+    ) {
+      return res
+        .status(400)
+        .json({ success: false, message: "সমস্ত প্রয়োজনীয় ফিল্ড পূরণ করুন" });
+    }
+
+    // ✅ নতুন অ্যাডমিন তৈরি
+    const newAdmin = new Admin({
+      ...payload,
+      loginStatus: payload.loginStatus || "self-login", // এখানে সেফলি সেট করা হচ্ছে
+    });
+
+    await newAdmin.save();
+
+    res.status(201).json({
+      success: true,
+      message: "অ্যাডমিন সফলভাবে যোগ করা হয়েছে!",
+      insertedId: newAdmin._id,
+      data: newAdmin, // ✅ frontend-এ সব ডাটা পাঠানো হচ্ছে
+    });
+  } catch (error) {
+    console.error("Error creating admin:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "অ্যাডমিন যোগ করতে ব্যর্থ",
+      error: error.message,
+    });
   }
 });
 
@@ -92,6 +132,74 @@ router.post("/ad-login", async (req, res) => {
   }
 });
 
+// ব্যালেন্স যোগ করার API
+router.post("/add-balance", async (req, res) => {
+  try {
+    const { adminId, amount, role } = req.body;
+
+    console.log("Received:", { adminId, amount, role });
+
+    // ভ্যালিডেশন
+    if (!adminId || !amount || amount <= 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid admin ID or amount" });
+    }
+
+    // রোল চেক
+    if (role !== "MA") {
+      return res
+        .status(401)
+        .json({ success: false, message: "Not authorized! Only Mother Admin can add balance." });
+    }
+
+    // অ্যাডমিন খুঁজে বের করুন
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin not found" });
+    }
+
+    // ব্যালেন্স আপডেট করুন
+    const newBalance = (admin.balance || 0) + amount;
+    admin.balance = newBalance;
+    admin.updatedAt = new Date();
+    await admin.save();
+
+    // ট্রানজ্যাকশন রেকর্ড সংরক্ষণ
+    const transaction = new Transaction({
+      adminId: admin._id,
+      amount: amount,
+      type: "D", // Deposit
+      performedBy: admin._id,
+      performedByName: admin.username,
+      fromTo: "Self", // মাদার অ্যাডমিন নিজের ব্যালেন্স যোগ করছে
+      balance: newBalance, // নতুন ব্যালেন্স
+      transactionType: "depositUpline", // ধরে নিচ্ছি নিজের ব্যালেন্স যোগ
+      toAdminId: admin._id,
+      toAdminName: admin.username,
+      fromAdminId: admin._id,
+      fromAdminName: admin.username,
+      remark: `Balance added by Mother Admin`,
+      ipAddress: req.ip || "-", // রিকোয়েস্ট থেকে IP নেওয়া
+      datetime: new Date(),
+    });
+    await transaction.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Balance added successfully",
+      updatedBalance: admin.balance,
+    });
+  } catch (error) {
+    console.error("Error adding balance:", error.message, error.stack);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to add balance", error: error.message });
+  }
+});
+
 
 // 🔐 user Admin LOGIN API
 router.post("/user-login", async (req, res) => {
@@ -122,8 +230,7 @@ router.post("/user-login", async (req, res) => {
   }
 });
 
-
-// user profile update 
+// user profile update
 // 🔐 Update User Profile (without bcrypt)
 router.put("/update-profile/:id", async (req, res) => {
   try {
@@ -158,7 +265,6 @@ router.put("/update-profile/:id", async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-
 
 // Get single admin by ID
 router.get("/:id", async (req, res) => {
@@ -535,13 +641,11 @@ router.post("/change-status", async (req, res) => {
       .json({ success: true, message: "Status changed successfully", admin });
   } catch (error) {
     console.error("Error changing status:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to change status",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Failed to change status",
+      error: error.message,
+    });
   }
 });
 

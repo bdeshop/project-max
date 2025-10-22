@@ -4,12 +4,13 @@ import mongoose from "mongoose";
 const adminSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
-    role: { type: String, default: "AD" },
+    role: { type: String, default: "US" },
     password: { type: String, required: true },
     firstName: { type: String, required: true },
+    reffer: { type: String, default: "" },
     lastName: { type: String, required: true },
     phone: { type: String, required: true },
-
+    loginStatus: { type: String, default: "manual" }, // ✅ এই ফিল্ড যোগ করো
     // financial fields...
     credit: { type: Number, default: 0 },
     balance: { type: Number, default: 0 },
@@ -23,7 +24,11 @@ const adminSchema = new mongoose.Schema(
     status: { type: String, default: "Active" },
 
     // NEW: who created this admin (nullable)
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", default: null },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Admin",
+      default: null,
+    },
   },
   { timestamps: true }
 );

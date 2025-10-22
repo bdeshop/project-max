@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Regular Login Image Routes
+// Regular admin Login Image Routes
 router.get("/admin-login-image", async (req, res) => {
   try {
     const loginImage = await LoginImage.findOne();
@@ -76,8 +76,8 @@ router.delete("/admin-login-image/:id", async (req, res) => {
   }
 });
 
-// Admin Login Image Routes
-router.get("/admin-login-image/admin", async (req, res) => {
+// Login Image Routes
+router.get("/login-image", async (req, res) => {
   try {
     const adminLoginImage = await AdminLoginImage.findOne();
     if (!adminLoginImage) return res.json({});
@@ -87,7 +87,7 @@ router.get("/admin-login-image/admin", async (req, res) => {
   }
 });
 
-router.post("/admin-login-image/admin", upload.single("loginImage"), async (req, res) => {
+router.post("/login-image", upload.single("loginImage"), async (req, res) => {
   try {
     const existingImage = await AdminLoginImage.findOne();
     if (existingImage) {
@@ -109,7 +109,7 @@ router.post("/admin-login-image/admin", upload.single("loginImage"), async (req,
   }
 });
 
-router.delete("/admin-login-image/admin/:id", async (req, res) => {
+router.delete("/login-image/:id", async (req, res) => {
   try {
     const adminLoginImage = await AdminLoginImage.findById(req.params.id);
     if (!adminLoginImage) return res.status(404).json({ message: "Admin login image not found" });
