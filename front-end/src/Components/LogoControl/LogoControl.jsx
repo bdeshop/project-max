@@ -16,7 +16,7 @@ const LogoControl = () => {
 
   const baseUrl = import.meta.env.VITE_API_URL;
   const logoUrl = logo ? `${baseUrl}${logo.startsWith("/") ? "" : "/"}${logo}` : null;
-
+  
   // ✅ File select
   const handleChange = (e) => {
     const selectedFile = e.target.files[0];
