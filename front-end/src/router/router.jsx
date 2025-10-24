@@ -40,6 +40,10 @@ import AgentPrivetRoute from "../routes/AgentPrivetRoute";
 import SubAgentPrivetRoute from "../routes/SubAgentPrivetRoute";
 import HomeControl from "../pages/HomeControl/HomeControl";
 import ColorControl from "../pages/ColorControl/ColorControl";
+import GeneralSetting from "../pages/GeneralSetting/GeneralSetting";
+import DepositRequest from "../pages/DepositRequst/DepositRequst";
+import TransactionHistory from "../pages/TransactionHistory/TransactionHistory";
+
 
 export const routes = createBrowserRouter([
   {
@@ -88,6 +92,30 @@ export const routes = createBrowserRouter([
         element: (
           <MotherAdminRoute>
             <ColorControl></ColorControl>
+          </MotherAdminRoute>
+        ),
+      },
+      {
+        path: "general-setting",
+        element: (
+          <MotherAdminRoute>
+            <GeneralSetting></GeneralSetting>
+          </MotherAdminRoute>
+        ),
+      },
+       {
+        path: "deposit-request",
+        element: (
+          <MotherAdminRoute>
+            <DepositRequest></DepositRequest>
+          </MotherAdminRoute>
+        ),
+      },
+      {
+        path: "transaction-history",
+        element: (
+          <MotherAdminRoute>
+            <TransactionHistory></TransactionHistory>
           </MotherAdminRoute>
         ),
       },

@@ -29,6 +29,9 @@ const Sidebar = () => {
     ControllerDropdown = [
       { name: "Home Control", path: `/${"ma"}/home-control` },
       { name: "Color Control", path: `/${"ma"}/color-control` },
+      { name: "General Setting", path: `/${"ma"}/general-setting` },
+      { name: "Deposit Request", path: `/${"ma"}/deposit-request` },
+      { name: "Transaction History", path: `/${"ma"}/transaction-history` },
     ];
   }
 
