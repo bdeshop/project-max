@@ -17,6 +17,9 @@ import bannerRoutes from "./routes/bannerRoutes.js";
 import countRoutes from "./routes/countRoutes.js";
 import webMenuRoutes from "./routes/webMenuRoutes.js";
 import subCategoryRoutes from "./routes/subCategoryRoutes.js"; // New route
+import depositRoutes from "./routes/depositRoutes.js"; // New route
+import depositMethodRoutes from "./routes/depositMethodRoutes.js"; // New route
+import depositRequestRoutes from "./routes/depositRequestRoutes.js"; // New route
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -53,6 +56,9 @@ app.use("/api", bannerRoutes);
 app.use("/api", countRoutes);
 app.use("/api", webMenuRoutes);
 app.use("/api", subCategoryRoutes); // Add subcategory routes
+app.use("/api", depositRoutes); // নতুন যোগ
+app.use("/api", depositMethodRoutes); // নতুন যোগ
+app.use("/api", depositRequestRoutes); // নতুন যোগ
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
