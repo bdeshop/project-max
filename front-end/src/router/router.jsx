@@ -43,6 +43,8 @@ import ColorControl from "../pages/ColorControl/ColorControl";
 import GeneralSetting from "../pages/GeneralSetting/GeneralSetting";
 import DepositRequest from "../pages/DepositRequst/DepositRequst";
 import TransactionHistory from "../pages/TransactionHistory/TransactionHistory";
+import WithdrawRequest from "../pages/WithdrawRequest/WithdrawRequest";
+import OthersAdminLogin from "../pages/Logins/OthersAdminLogin/OthersAdminLogin";
 
 
 export const routes = createBrowserRouter([
@@ -108,6 +110,14 @@ export const routes = createBrowserRouter([
         element: (
           <MotherAdminRoute>
             <DepositRequest></DepositRequest>
+          </MotherAdminRoute>
+        ),
+      },
+      {
+        path: "withdraw-request",
+        element: (
+          <MotherAdminRoute>
+            <WithdrawRequest></WithdrawRequest>
           </MotherAdminRoute>
         ),
       },
@@ -237,6 +247,10 @@ export const routes = createBrowserRouter([
   {
     path: "ag",
     element: <MotherAdminLogin></MotherAdminLogin>,
+  },
+  {
+    path: "ad",
+    element: <OthersAdminLogin></OthersAdminLogin>,
   },
   {
     path: "/sa",

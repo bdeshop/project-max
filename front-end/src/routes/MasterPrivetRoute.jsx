@@ -10,7 +10,7 @@ const MasterPrivetRoute = ({ children }) => {
 
   // Check if user is logged in and has role "Mother Admin"
   if (!motherAdmin) {
-    return <Navigate to="/ag" state={{ from: location?.pathname }} />;
+    return <Navigate to="/ad" state={{ from: location?.pathname }} />;
   }
 
   return children;
