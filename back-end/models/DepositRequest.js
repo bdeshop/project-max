@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const depositRequestSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", required: true }, // Changed ref to "Admin"
   paymentType: { type: String, required: true },
+  selectedMethod: { type: String, required: true },
   amount: { type: Number, required: true },
   pbuAmount: { type: Number, required: true },
   totalPBU: { type: Number, required: true },

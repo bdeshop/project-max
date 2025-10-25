@@ -74,15 +74,20 @@ router.get("/deposit/history/user/:userId", async (req, res) => {
   }
 });
 
-// GET: All deposit history (admin)
+// ✅ সব ডিপোজিট হিস্ট্রি (pending বাদে)
 router.get("/deposit/history", async (req, res) => {
   try {
     const history = await DepositRequest.find({ status: { $ne: "pending" } })
-      .populate("userId", "username firstName lastName email")
+      .populate("userId", "username") // Admin থেকে username আনবে
       .sort({ createdAt: -1 });
+
     res.status(200).json(history);
   } catch (error) {
-    res.status(500).json({ message: "হিস্ট্রি লোড ব্যর্থ", error: error.message });
+    console.error("Error fetching deposit history:", error);
+    res.status(500).json({
+      message: "হিস্ট্রি লোড ব্যর্থ",
+      error: error.message,
+    });
   }
 });
 

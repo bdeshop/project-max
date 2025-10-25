@@ -20,6 +20,7 @@ import subCategoryRoutes from "./routes/subCategoryRoutes.js"; // New route
 import depositRoutes from "./routes/depositRoutes.js"; // New route
 import depositMethodRoutes from "./routes/depositMethodRoutes.js"; // New route
 import depositRequestRoutes from "./routes/depositRequestRoutes.js"; // New route
+import withdrawRoutes from "./routes/withdrawRoutes.js"; // New route
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -59,6 +60,7 @@ app.use("/api", subCategoryRoutes); // Add subcategory routes
 app.use("/api", depositRoutes); // নতুন যোগ
 app.use("/api", depositMethodRoutes); // নতুন যোগ
 app.use("/api", depositRequestRoutes); // নতুন যোগ
+app.use("/api", withdrawRoutes); // API রুট মাউন্ট
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
