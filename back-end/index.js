@@ -63,8 +63,8 @@ app.use("/api", depositRequestRoutes); // নতুন যোগ
 app.use("/api", withdrawRoutes); // API রুট মাউন্ট
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT} v2.0`));
 
 app.get("/", (req, res) => {
-  res.status(200).send("Server is running");
+  res.status(200).send("Server is running v2.0");
 });

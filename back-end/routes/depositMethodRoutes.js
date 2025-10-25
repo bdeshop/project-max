@@ -31,12 +31,15 @@ router.get("/deposit/methods", async (req, res) => {
   }
 });
 
+
 // GET: স্পেসিফিক পেমেন্ট মেথড ফেচ
-router.get("/deposit/:id", async (req, res) => {
+router.get("/deposit/payment-method/:id", async (req, res) => {
   try {
     const method = await PaymentMethod.findOne({ id: req.params.id });
     if (!method) {
-      return res.status(404).json({ message: `পেমেন্ট মেথড ${req.params.id} পাওয়া যায়নি` });
+      return res
+        .status(404)
+        .json({ message: `পেমেন্ট মেথড ${req.params.id} পাওয়া যায়নি 2` });
     }
     res.status(200).json(method);
   } catch (error) {
@@ -44,6 +47,7 @@ router.get("/deposit/:id", async (req, res) => {
     res.status(500).json({ message: "সার্ভার এরর", error: error.message });
   }
 });
+
 // POST: নতুন পেমেন্ট মেথড যোগ করা
 router.post("/deposit/method", async (req, res) => {
   try {
@@ -75,7 +79,9 @@ router.put("/deposit/method/:id", async (req, res) => {
 // DELETE: পেমেন্ট মেথড ডিলিট করা
 router.delete("/deposit/method/:id", async (req, res) => {
   try {
-    const deletedMethod = await PaymentMethod.findOneAndDelete({ id: req.params.id });
+    const deletedMethod = await PaymentMethod.findOneAndDelete({
+      id: req.params.id,
+    });
     if (!deletedMethod) {
       return res.status(404).json({ message: "মেথড পাওয়া যায়নি" });
     }
@@ -94,7 +100,9 @@ router.post("/upload/logo", upload.single("logo"), (req, res) => {
     const logoUrl = `/uploads/${req.file.filename}`;
     res.status(200).json({ logoUrl });
   } catch (error) {
-    res.status(500).json({ message: "লোগো আপলোড ব্যর্থ", error: error.message });
+    res
+      .status(500)
+      .json({ message: "লোগো আপলোড ব্যর্থ", error: error.message });
   }
 });
 

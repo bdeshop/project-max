@@ -1,7 +1,6 @@
 import express from "express";
 import DepositRequest from "../models/DepositRequest.js";
 import Admin from "../models/Admin.js"; // Changed from User to Admin
-import PaymentMethod from "../models/PaymentMethod.js";
 
 const router = express.Router();
 
@@ -76,19 +75,24 @@ router.get("/deposit/history/user/:userId", async (req, res) => {
 
 // ✅ সব ডিপোজিট হিস্ট্রি (pending বাদে)
 router.get("/deposit/history", async (req, res) => {
-  try {
-    const history = await DepositRequest.find({ status: { $ne: "pending" } })
-      .populate("userId", "username") // Admin থেকে username আনবে
-      .sort({ createdAt: -1 });
 
-    res.status(200).json(history);
-  } catch (error) {
-    console.error("Error fetching deposit history:", error);
-    res.status(500).json({
-      message: "হিস্ট্রি লোড ব্যর্থ",
-      error: error.message,
-    });
-  }
+  console.log("this is reposit calling ");
+  
+
+
+  try {
+      const history = await DepositRequest.find({ status: { $ne: "pending" } }).populate("userId").sort({ createdAt: -1 });
+      res.status(200).json(history);
+    } catch (error) {
+      res.status(500).json({ message: "হিস্ট্রি লোড ব্যর্থ", error: error.message });
+      console.log(res.status)
+    }
 });
+
+
+
+
+
+
 
 export default router;
