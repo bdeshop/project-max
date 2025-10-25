@@ -87,7 +87,7 @@ const DepositRequest = () => {
                     <td className="p-3">{req.transactionId}</td>
                     <td className="p-3">{req.number}</td>
                     <td className="p-3">
-                      {new Date(req.createdAt).toLocaleDateString("bn-BD", {
+                      {new Date(req.createdAt).toLocaleDateString("en-EN", {
                         timeZone: "Asia/Dhaka",
                       })}
                     </td>

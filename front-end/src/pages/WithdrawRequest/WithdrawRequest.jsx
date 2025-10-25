@@ -74,8 +74,8 @@ const WithdrawRequest = () => {
                 <td className="border p-2">{req.pbuAmount.toFixed(2)}</td>
                 <td className="border p-2">{req.number}</td>
                 <td className="border p-2">
-                  <button onClick={() => handleApprove(req._id)} className="bg-green-500 text-white px-3 py-1 rounded-md mr-2">Approve</button>
-                  <button onClick={() => handleCancel(req._id)} className="bg-red-500 text-white px-3 py-1 rounded-md">Cancel</button>
+                  <button onClick={() => handleApprove(req._id)} className="bg-green-500 cursor-pointer text-white px-3 py-1 rounded-md mr-2">Approve</button>
+                  <button onClick={() => handleCancel(req._id)} className="bg-red-500 cursor-pointer text-white px-3 py-1 rounded-md">Cancel</button>
                 </td>
               </tr>
             ))}
