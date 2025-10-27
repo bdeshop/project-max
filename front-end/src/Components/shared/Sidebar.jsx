@@ -33,6 +33,8 @@ const Sidebar = () => {
       { name: "Deposit Request", path: `/${"ma"}/deposit-request` },
       { name: "Transaction History", path: `/${"ma"}/transaction-history` },
       { name: "Withdraw Request", path: `/${"ma"}/withdraw-request` },
+      { name: "Add Category Provider", path: `/${"ma"}/add-category` },
+      { name: "Add Games", path: `/${"ma"}/add-games` },
     ];
   }
 

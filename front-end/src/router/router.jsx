@@ -46,6 +46,9 @@ import TransactionHistory from "../pages/TransactionHistory/TransactionHistory";
 import WithdrawRequest from "../pages/WithdrawRequest/WithdrawRequest";
 import OthersAdminLogin from "../pages/Logins/OthersAdminLogin/OthersAdminLogin";
 
+import AddSubCategory from "../pages/AddSubCategory/AddSubCategory";
+import AddGames from "../pages/AddGames/AddGames";
+import IfrTest from "../Components/IfrTest/IfrTest";
 
 export const routes = createBrowserRouter([
   {
@@ -105,11 +108,28 @@ export const routes = createBrowserRouter([
           </MotherAdminRoute>
         ),
       },
-       {
+      {
         path: "deposit-request",
         element: (
           <MotherAdminRoute>
             <DepositRequest></DepositRequest>
+          </MotherAdminRoute>
+        ),
+      },
+
+      {
+        path: "add-category",
+        element: (
+          <MotherAdminRoute>
+            <AddSubCategory></AddSubCategory>
+          </MotherAdminRoute>
+        ),
+      },
+      {
+        path: "add-games",
+        element: (
+          <MotherAdminRoute>
+            <AddGames></AddGames>
           </MotherAdminRoute>
         ),
       },
