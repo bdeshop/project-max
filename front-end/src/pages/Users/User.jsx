@@ -55,17 +55,30 @@ const Users = () => {
     });
   };
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get(
+const fetchUsers = async () => {
+  try {
+    let res;
+
+    // ✅ যদি mother admin হয়
+    if (motherAdmin?.role === "MA") {
+      res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admins`);
+    } 
+    // ✅ অন্য admin হলে শুধু নিজের তৈরি user ফেচ করবে
+    else {
+      res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/admins/created/${motherAdmin?._id}`
       );
-      setUsers(res.data.filter((u) => u.role === "US"));
-    } catch (error) {
-      console.error("Fetch error:", error);
-      toast.error("❌ Failed to load user data");
     }
-  };
+
+    // ✅ শুধু role === "US" ফিল্টার করা হচ্ছে
+    const filteredUsers = res.data.filter((u) => u.role === "US");
+    setUsers(filteredUsers);
+  } catch (error) {
+    console.error("Fetch error:", error);
+    toast.error("❌ Failed to load user data");
+  }
+};
+
 
   useEffect(() => {
     if (motherAdmin) {
