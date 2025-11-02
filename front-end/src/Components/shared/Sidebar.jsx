@@ -27,23 +27,25 @@ const Sidebar = () => {
 
   if (motherAdmin?.role === "MA") {
     ControllerDropdown = [
-      { name: "Home Control", path: `/${"ma"}/home-control` },
-      { name: "Color Control", path: `/${"ma"}/color-control` },
-      { name: "General Setting", path: `/${"ma"}/general-setting` },
-      { name: "Deposit Request", path: `/${"ma"}/deposit-request` },
-      { name: "Transaction History", path: `/${"ma"}/transaction-history` },
-      { name: "Withdraw Request", path: `/${"ma"}/withdraw-request` },
+      { name: "Home Control", path: `/home-control` },
+      { name: "Color Control", path: `/color-control` },
+      { name: "General Setting", path: `/general-setting` },
+      { name: "Deposit Request", path: `/deposit-request` },
+      { name: "Transaction History", path: `/transaction-history` },
+      { name: "Withdraw Request", path: `/withdraw-request` },
+      { name: "Add Category Provider", path: `/add-category` },
+      { name: "Add Games", path: `/add-games` },
     ];
   }
 
   if (motherAdmin?.role === "MA") {
     downlineDropdown = [
-      { name: "Mother Admin", path: `/${"ma"}/mother-admin` },
-      { name: "Sub Admin", path: `/${"ma"}/sub-admin` },
-      { name: "Master", path: `/${"ma"}/master` },
-      { name: "Agent", path: `/${"ma"}/agent` },
-      { name: "Sub Agent", path: `/${"ma"}/sub-agent` },
-      { name: "User", path: `/${"ma"}/users` },
+      { name: "Mother Admin", path: `/mother-admin` },
+      { name: "Sub Admin", path: `/sub-admin` },
+      { name: "Master", path: `/master` },
+      { name: "Agent", path: `/agent` },
+      { name: "Sub Agent", path: `/sub-agent` },
+      { name: "User", path: `/users` },
     ];
   } else if (motherAdmin?.role === "SA") {
     downlineDropdown = [
@@ -86,19 +88,19 @@ const Sidebar = () => {
       dropdown: [
         {
           name: "Account Statement",
-          path: `/${motherAdmin?.role.toLowerCase()}/account-statement`,
+          path: `/account-statement`,
         },
         {
           name: "Account Summary",
-          path: `/${motherAdmin?.role.toLowerCase()}/account-summary`,
+          path: `/account-summary`,
         },
         {
           name: "Profile",
-          path: `/${motherAdmin?.role.toLowerCase()}/profile`,
+          path: `/profile`,
         },
         {
           name: "Active Log",
-          path: `/${motherAdmin?.role.toLowerCase()}/active-log`,
+          path: `/active-log`,
         },
       ],
     },
@@ -107,39 +109,39 @@ const Sidebar = () => {
       dropdown: [
         {
           name: "Profit/Loss Report by Downline",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pnl-downline`,
+          path: `/my-report-pnl-downline`,
         },
         {
           name: "Profit/Loss Report by Parlay Downline",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-parlay-downline`,
+          path: `/my-report-parlay-downline`,
         },
         {
           name: "Summary Profit/Loss Report",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-summary-pnl`,
+          path: `/my-report-summary-pnl`,
         },
         {
           name: "Profit/Loss Report by Market",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pl-market`,
+          path: `/my-report-pl-market`,
         },
         {
           name: "Profit/Loss Report by Player",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pl-player`,
+          path: `/my-report-pl-player`,
         },
         {
           name: "Profit/Loss Report by All Casino",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pl-casino`,
+          path: `/my-report-pl-casino`,
         },
         {
           name: "Profit/Loss Report by Casino Downline",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-pnl-casino-downline`,
+          path: `/my-report-pnl-casino-downline`,
         },
         {
           name: "Spin History",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-spin`,
+          path: `/my-report-spin`,
         },
         {
           name: "Pending Spin Users",
-          path: `/${motherAdmin?.role.toLowerCase()}/my-report-spinList`,
+          path: `/my-report-spinList`,
         },
       ],
     },
@@ -148,32 +150,32 @@ const Sidebar = () => {
       dropdown: [
         {
           name: "Risk Management",
-          path: `/${motherAdmin?.role.toLowerCase()}/risk-management`,
+          path: `/risk-management`,
         },
-        { name: "MM", path: `/${motherAdmin?.role.toLowerCase()}/mm` },
+        { name: "MM", path: `/mm` },
         {
           name: "Settings",
-          path: `/${motherAdmin?.role.toLowerCase()}/settings`,
+          path: `/settings`,
         },
         {
           name: "P-Settings",
-          path: `/${motherAdmin?.role.toLowerCase()}/p-settings`,
+          path: `/p-settings`,
         },
-        { name: "Ticker", path: `/${motherAdmin?.role.toLowerCase()}/ticker` },
+        { name: "Ticker", path: `/ticker` },
         {
           name: "Pop Ticker",
-          path: `/${motherAdmin?.role.toLowerCase()}/pop-ticker`,
+          path: `/pop-ticker`,
         },
-        { name: "Social", path: `/${motherAdmin?.role.toLowerCase()}/social` },
+        { name: "Social", path: `/social` },
         {
           name: "Upload Banner",
-          path: `/${motherAdmin?.role.toLowerCase()}/upload-banner`,
+          path: `/upload-banner`,
         },
       ],
     },
-    { name: "BetList", path: `/${motherAdmin?.role.toLowerCase()}/bet-list` },
-    { name: "Live Bet", path: `/${motherAdmin?.role.toLowerCase()}/live-bet` },
-    { name: "Banking", path: `/${motherAdmin?.role.toLowerCase()}/banking` },
+    { name: "BetList", path: `/bet-list` },
+    { name: "Live Bet", path: `/live-bet` },
+    { name: "Banking", path: `/banking` },
     {
       name: "Controller",
       dropdown: ControllerDropdown,
@@ -184,7 +186,7 @@ const Sidebar = () => {
   const activeNavItemName = useMemo(() => {
     const currentPath = location.pathname;
 
-    // Flatten navItems to include all paths (including dropdowns)
+    /// Flatten navItems to include all paths (including dropdowns)
     const allNavItems = navItems.flatMap((item) =>
       item.dropdown
         ? item.dropdown.map((drop) => ({ name: drop.name, path: drop.path }))
@@ -196,7 +198,7 @@ const Sidebar = () => {
       currentPath.startsWith(item.path)
     );
 
-    return activeItem ? activeItem.name : "Downline List"; // Fallback to "Downline List"
+    return activeItem ? activeItem.name : "Downline List"; //  Fallback to "Downline List"
   }, [location.pathname, navItems]);
 
   return (

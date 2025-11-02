@@ -55,30 +55,17 @@ const Users = () => {
     });
   };
 
-const fetchUsers = async () => {
-  try {
-    let res;
-
-    // ✅ যদি mother admin হয়
-    if (motherAdmin?.role === "MA") {
-      res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admins`);
-    } 
-    // ✅ অন্য admin হলে শুধু নিজের তৈরি user ফেচ করবে
-    else {
-      res = await axios.get(
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/admins/created/${motherAdmin?._id}`
       );
+      setUsers(res.data.filter((u) => u.role === "US"));
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error("❌ Failed to load user data");
     }
-
-    // ✅ শুধু role === "US" ফিল্টার করা হচ্ছে
-    const filteredUsers = res.data.filter((u) => u.role === "US");
-    setUsers(filteredUsers);
-  } catch (error) {
-    console.error("Fetch error:", error);
-    toast.error("❌ Failed to load user data");
-  }
-};
-
+  };
 
   useEffect(() => {
     if (motherAdmin) {
@@ -104,7 +91,7 @@ const fetchUsers = async () => {
           username: "",
           password: "",
           firstName: "",
-          reffer:" ",
+          reffer: " ",
           lastName: "",
           phone: "",
           timeZone: "Asia/Dhaka",
@@ -225,11 +212,11 @@ const fetchUsers = async () => {
       <div className="flex bg-[#f5f6f8] border-b mb-5 overflow-hidden">
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Total Balance</p>
-          <h2 className="font-extrabold text-lg text-black">PBU 3,96,500.00</h2>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Net Exposure</p>
-          <h2 className="font-extrabold text-lg text-red-600">PBU (610.17)</h2>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Balance</p>
@@ -237,13 +224,11 @@ const fetchUsers = async () => {
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Balance in Downline</p>
-          <h2 className="font-extrabold text-lg text-black">PBU 63,825.13</h2>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
         </div>
         <div className="flex-1 px-4 py-3">
           <p className="text-gray-600 text-sm">Transferable P/L with Upline</p>
-          <h2 className="font-extrabold text-lg text-red-600">
-            PBU (3,32,080.13)
-          </h2>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
         </div>
       </div>
 
@@ -511,7 +496,6 @@ const fetchUsers = async () => {
                         placeholder="Reffer Code (Optional)"
                         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-red-200"
                       />
-
                     </div>
                   </div>
                   <div>

@@ -46,10 +46,14 @@ import TransactionHistory from "../pages/TransactionHistory/TransactionHistory";
 import WithdrawRequest from "../pages/WithdrawRequest/WithdrawRequest";
 import OthersAdminLogin from "../pages/Logins/OthersAdminLogin/OthersAdminLogin";
 
+import AddSubCategory from "../pages/AddSubCategory/AddSubCategory";
+import AddGames from "../pages/AddGames/AddGames";
+import IfrTest from "../Components/IfrTest/IfrTest";
+import { IoMdWarning } from "react-icons/io";
 
 export const routes = createBrowserRouter([
   {
-    path: "/ma",
+    path: "/",
     element: (
       <MotherAdminRoute>
         {" "}
@@ -105,11 +109,28 @@ export const routes = createBrowserRouter([
           </MotherAdminRoute>
         ),
       },
-       {
+      {
         path: "deposit-request",
         element: (
           <MotherAdminRoute>
             <DepositRequest></DepositRequest>
+          </MotherAdminRoute>
+        ),
+      },
+
+      {
+        path: "add-category",
+        element: (
+          <MotherAdminRoute>
+            <AddSubCategory></AddSubCategory>
+          </MotherAdminRoute>
+        ),
+      },
+      {
+        path: "add-games",
+        element: (
+          <MotherAdminRoute>
+            <AddGames></AddGames>
           </MotherAdminRoute>
         ),
       },
@@ -246,11 +267,43 @@ export const routes = createBrowserRouter([
   },
   {
     path: "ag",
-    element: <MotherAdminLogin></MotherAdminLogin>,
+    element:
+      import.meta.env.VITE_USER_ROLE === "TOPADMIN" ? (
+        <MotherAdminLogin></MotherAdminLogin>
+      ) : (
+        <div className="flex items-center justify-center h-full bg-red-500 text-white">
+          <div className="p-10 text-4xl font-bold">
+            <span
+              className="flex items-center"
+              role="img"
+              aria-label="not authorized"
+            >
+              <IoMdWarning className="mr-2" />
+              Not Authorized
+            </span>
+          </div>
+        </div>
+      ),
   },
   {
     path: "ad",
-    element: <OthersAdminLogin></OthersAdminLogin>,
+    element:
+      import.meta.env.VITE_USER_ROLE === "LOWADMIN" ? (
+        <OthersAdminLogin></OthersAdminLogin>
+      ) : (
+        <div className="flex items-center justify-center h-full bg-red-500 text-white">
+          <div className="p-10 text-4xl font-bold">
+            <span
+              className="flex items-center"
+              role="img"
+              aria-label="not authorized"
+            >
+              <IoMdWarning className="mr-2" />
+              Not Authorized
+            </span>
+          </div>
+        </div>
+      ),
   },
   {
     path: "/sa",

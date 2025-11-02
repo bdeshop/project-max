@@ -215,11 +215,11 @@ const SubAgent = () => {
       <div className="flex bg-[#f5f6f8] border-b mb-5 overflow-hidden">
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Total Balance</p>
-          <h2 className="font-extrabold text-lg text-black">PBU 3,96,500.00</h2>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Net Exposure</p>
-          <h2 className="font-extrabold text-lg text-red-600">PBU (610.17)</h2>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Balance</p>
@@ -227,13 +227,11 @@ const SubAgent = () => {
         </div>
         <div className="flex-1 px-4 py-3 border-r">
           <p className="text-gray-600 text-sm">Balance in Downline</p>
-          <h2 className="font-extrabold text-lg text-black">PBU 63,825.13</h2>
+          <h2 className="font-extrabold text-lg text-black">PBU 00.00</h2>
         </div>
         <div className="flex-1 px-4 py-3">
           <p className="text-gray-600 text-sm">Transferable P/L with Upline</p>
-          <h2 className="font-extrabold text-lg text-red-600">
-            PBU (3,32,080.13)
-          </h2>
+          <h2 className="font-extrabold text-lg text-red-600">PBU (00.00)</h2>
         </div>
       </div>
 
