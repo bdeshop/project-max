@@ -292,7 +292,7 @@ const Agent = () => {
                   <span
                     onClick={() =>
                       navigate(
-                        `/${motherAdmin.role.toLowerCase()}/created-admins/${
+                        `/created-admins/${
                           u._id
                         }`
                       )
