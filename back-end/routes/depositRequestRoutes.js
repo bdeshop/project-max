@@ -11,7 +11,9 @@ router.post("/deposit/request", async (req, res) => {
     await newRequest.save();
     res.status(201).json({ message: "পেন্ডিং রিকোয়েস্ট তৈরি সফল" });
   } catch (error) {
-    res.status(500).json({ message: "রিকোয়েস্ট তৈরি ব্যর্থ", error: error.message });
+    res
+      .status(500)
+      .json({ message: "রিকোয়েস্ট তৈরি ব্যর্থ", error: error.message });
   }
 });
 
@@ -24,25 +26,54 @@ router.get("/deposit/requests/pending", async (req, res) => {
     });
     res.status(200).json(requests);
   } catch (error) {
-    res.status(500).json({ message: "পেন্ডিং রিকোয়েস্ট লোড ব্যর্থ", error: error.message });
+    res
+      .status(500)
+      .json({ message: "পেন্ডিং রিকোয়েস্ট লোড ব্যর্থ", error: error.message });
   }
 });
-
+-
 // PUT: Approve a deposit request
 router.put("/deposit/request/:id/approve", async (req, res) => {
   try {
+    // ডিপোজিট রিকোয়েস্ট খোঁজা
     const request = await DepositRequest.findById(req.params.id);
-    if (!request) return res.status(404).json({ message: "রিকোয়েস্ট পাওয়া যায়নি" });
+    if (!request)
+      return res.status(404).json({ message: "রিকোয়েস্ট পাওয়া যায়নি" });
+
+    // রিকোয়েস্ট স্ট্যাটাস আপডেট
     request.status = "approved";
     await request.save();
 
-    // Update user balance
-    const admin = await Admin.findById(request.userId); // Changed from User to Admin
-    if (!admin) return res.status(404).json({ message: "ইউজার পাওয়া যায়নি" });
-    admin.balance += request.totalPBU;
-    await admin.save();
+    // ইউজারের ব্যালেন্স আপডেট (ইউজার আসলে Admin কালেকশন থেকে নিচ্ছো)
+    const user = await Admin.findById(request.userId);
+    if (!user) return res.status(404).json({ message: "ইউজার পাওয়া যায়নি" });
 
-    res.status(200).json({ message: "অ্যাপ্রুভ সফল! PBU যোগ হয়েছে" });
+    // ✅ মেইন অ্যাডমিন খোঁজা (যার ব্যালেন্স থেকে টাকা কাটা হবে)
+    const mainAdmin = await Admin.findOne({ role: "MA" }); // অথবা তোমার নির্দিষ্ট admin ID দিতে পারো
+    if (!mainAdmin)
+      return res.status(404).json({ message: "অ্যাডমিন পাওয়া যায়নি" });
+
+    // অ্যাডমিনের ব্যালেন্স চেক
+    if (mainAdmin.balance < request.totalPBU) {
+      return res
+        .status(400)
+        .json({ message: "অ্যাডমিনের ব্যালেন্স অপর্যাপ্ত!" });
+    }
+
+    // ✅ ইউজারের ব্যালেন্সে টাকা যোগ করা
+    user.balance += request.totalPBU;
+    await user.save();
+
+    // ✅ অ্যাডমিনের ব্যালেন্স থেকে টাকা বিয়োগ করা
+    mainAdmin.balance -= request.totalPBU;
+    await mainAdmin.save();
+
+    res
+      .status(200)
+      .json({
+        message:
+          "অ্যাপ্রুভ সফল! ইউজারের ব্যালেন্সে PBU যোগ হয়েছে এবং অ্যাডমিনের ব্যালেন্স থেকে কাটা হয়েছে।",
+      });
   } catch (error) {
     res.status(500).json({ message: "অ্যাপ্রুভ ব্যর্থ", error: error.message });
   }
@@ -52,7 +83,8 @@ router.put("/deposit/request/:id/approve", async (req, res) => {
 router.put("/deposit/request/:id/cancel", async (req, res) => {
   try {
     const request = await DepositRequest.findById(req.params.id);
-    if (!request) return res.status(404).json({ message: "রিকোয়েস্ট পাওয়া যায়নি" });
+    if (!request)
+      return res.status(404).json({ message: "রিকোয়েস্ট পাওয়া যায়নি" });
     request.status = "cancelled";
     await request.save();
     res.status(200).json({ message: "ক্যানসেল সফল" });
@@ -69,30 +101,27 @@ router.get("/deposit/history/user/:userId", async (req, res) => {
       .sort({ createdAt: -1 });
     res.status(200).json(history);
   } catch (error) {
-    res.status(500).json({ message: "হিস্ট্রি লোড ব্যর্থ", error: error.message });
+    res
+      .status(500)
+      .json({ message: "হিস্ট্রি লোড ব্যর্থ", error: error.message });
   }
 });
 
 // ✅ সব ডিপোজিট হিস্ট্রি (pending বাদে)
 router.get("/deposit/history", async (req, res) => {
-
   console.log("this is reposit calling ");
-  
-
 
   try {
-      const history = await DepositRequest.find({ status: { $ne: "pending" } }).populate("userId").sort({ createdAt: -1 });
-      res.status(200).json(history);
-    } catch (error) {
-      res.status(500).json({ message: "হিস্ট্রি লোড ব্যর্থ", error: error.message });
-      console.log(res.status)
-    }
+    const history = await DepositRequest.find({ status: { $ne: "pending" } })
+      .populate("userId")
+      .sort({ createdAt: -1 });
+    res.status(200).json(history);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "হিস্ট্রি লোড ব্যর্থ", error: error.message });
+    console.log(res.status);
+  }
 });
-
-
-
-
-
-
 
 export default router;
