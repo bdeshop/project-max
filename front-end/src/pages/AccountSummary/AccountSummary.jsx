@@ -28,7 +28,7 @@ const AccountSummary = () => {
     setLoading(true); // লোডিং শুরু
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/admins/add-balance",
+        "https://newapi.enjoy365.online/api/admins/add-balance",
         {
           adminId: motherAdmin._id,
           amount: parseFloat(amount),

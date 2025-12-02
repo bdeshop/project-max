@@ -1,6 +1,8 @@
 import express from "express";
 import Admin from "../models/Admin.js";
 import Transaction from "../models/Transaction.js"; // Import Transaction model
+import User from "../models/User.js";
+
 const router = express.Router();
 
 // Create admin
@@ -148,9 +150,10 @@ router.post("/add-balance", async (req, res) => {
 
     // রোল চেক
     if (role !== "MA") {
-      return res
-        .status(401)
-        .json({ success: false, message: "Not authorized! Only Mother Admin can add balance." });
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized! Only Mother Admin can add balance.",
+      });
     }
 
     // অ্যাডমিন খুঁজে বের করুন
@@ -194,12 +197,13 @@ router.post("/add-balance", async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding balance:", error.message, error.stack);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to add balance", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to add balance",
+      error: error.message,
+    });
   }
 });
-
 
 // 🔐 user Admin LOGIN API
 router.post("/user-login", async (req, res) => {
@@ -650,3 +654,26 @@ router.post("/change-status", async (req, res) => {
 });
 
 export default router;
+
+// Get user balance (by user id) - returns latest balance from User model
+router.get("/user-balance/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId)
+      return res
+        .status(400)
+        .json({ success: false, message: "userId required" });
+
+    const user = await Admin.findById(userId).select("balance");
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    return res.status(200).json({ success: true, balance: user.balance });
+  } catch (error) {
+    console.error("Error fetching user balance:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});

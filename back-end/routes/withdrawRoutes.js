@@ -30,17 +30,28 @@ router.put("/withdraw/request/:id/approve", async (req, res) => {
   try {
     const request = await WithdrawalRequest.findById(req.params.id);
     if (!request) return res.status(404).json({ message: "রিকোয়েস্ট পাওয়া যায়নি" });
+
+    // রিকোয়েস্ট স্ট্যাটাস আপডেট
     request.status = "approved";
     await request.save();
 
-    // PBU ব্যালেন্স কাটা
+    // ইউজার থেকে PBU কাটা
     const user = await Admin.findById(request.userId);
     if (!user) return res.status(404).json({ message: "ইউজার পাওয়া যায়নি" });
-    if (user.balance < request.pbuAmount) return res.status(400).json({ message: "অপর্যাপ্ত PBU ব্যালেন্স" });
+    if (user.balance < request.pbuAmount)
+      return res.status(400).json({ message: "অপর্যাপ্ত PBU ব্যালেন্স" });
+
     user.balance -= request.pbuAmount;
     await user.save();
 
-    res.status(200).json({ message: "অ্যাপ্রুভ সফল! PBU কাটা হয়েছে" });
+    // ✅ অ্যাডমিন ব্যালেন্সে টাকা যোগ করা
+    const admin = await Admin.findOne({ role: "MA" }); // তোমার সিস্টেমে যেভাবে admin শনাক্ত করো
+    if (!admin) return res.status(404).json({ message: "অ্যাডমিন পাওয়া যায়নি" });
+
+    admin.balance += request.pbuAmount;
+    await admin.save();
+
+    res.status(200).json({ message: "অ্যাপ্রুভ সফল! ইউজার থেকে PBU কাটা হয়েছে এবং অ্যাডমিনকে যোগ করা হয়েছে।" });
   } catch (error) {
     res.status(500).json({ message: "অ্যাপ্রুভ ব্যর্থ", error: error.message });
   }

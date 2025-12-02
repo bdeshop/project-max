@@ -3,7 +3,9 @@ import { FaSyncAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { AuthContext } from "../../../context/AuthContext";
+
 import { useNavigate } from "react-router";
+import bg_img from "../../../assets/videoframe_1631.png";
 
 const OthersAdminLogin = () => {
   const [userName, setUserName] = useState("");
@@ -63,7 +65,7 @@ const OthersAdminLogin = () => {
       if (data?.user) {
         login(data.user);
         toast.success("Login successful!");
-        if      (data.user.role === "SA") navigate("/sa/sub-admin");
+        if (data.user.role === "SA") navigate("/sa/sub-admin");
         else if (data.user.role === "MT") navigate("/mt/master");
         else if (data.user.role === "AG") navigate("/ag/agent");
         else if (data.user.role === "SG") navigate("/sg/sub-agent");
@@ -83,9 +85,7 @@ const OthersAdminLogin = () => {
   return (
     <div
       className="min-h-screen flex justify-center items-center bg-cover bg-center relative"
-      style={{
-        backgroundImage: "url('https://i.ibb.co.com/bMktQGPC/wp2793078.jpg')",
-      }}
+      style={{ backgroundImage: `url(${bg_img})` }}
     >
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
@@ -100,7 +100,7 @@ const OthersAdminLogin = () => {
         {/* Form */}
         <div className="w-full border-l-2 border-white pl-6">
           <h2 className="text-center text-white text-2xl font-bold mb-6">
-            Admin <span className="text-gray-300 font-normal">Sign in</span>
+            Agent <span className="text-gray-300 font-normal">Sign in</span>
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">

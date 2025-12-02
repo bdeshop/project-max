@@ -1,6 +1,17 @@
 // models/Admin.js
 import mongoose from "mongoose";
 
+const GameHistorySchema = new mongoose.Schema({
+  username: String,
+  bet_amount: Number,
+  win_amount: Number,
+  gameID: String,
+  serial_number: String,
+  currency: String,
+  status: String,
+  playedAt: Date,
+});
+
 const adminSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
@@ -22,7 +33,7 @@ const adminSchema = new mongoose.Schema(
 
     timeZone: { type: String, default: "Asia/Dhaka" },
     status: { type: String, default: "Active" },
-
+    gameHistory: [GameHistorySchema],
     // NEW: who created this admin (nullable)
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

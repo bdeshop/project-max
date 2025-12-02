@@ -22,10 +22,14 @@ const MotherAdminLogin = () => {
   // ✅ অ্যাডমিন ইমেজ ডাটা ফেচ
   const fetchAdminImage = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin-login-image`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/admin-login-image`
+      );
       if (res.data && res.data.loginImageUrl) {
         // ✅ Make sure it has full URL
-        const fullImageUrl = `${import.meta.env.VITE_API_URL}${res.data.loginImageUrl}`;
+        const fullImageUrl = `${import.meta.env.VITE_API_URL}${
+          res.data.loginImageUrl
+        }`;
         setAdminImage(fullImageUrl);
         console.log("✅ Admin Image URL:", fullImageUrl);
       }
@@ -59,7 +63,7 @@ const MotherAdminLogin = () => {
       if (data?.user) {
         login(data.user);
         toast.success("Login successful!");
-        if (data.user.role === "MA") navigate("/ma/mother-admin");
+        if (data.user.role === "MA") navigate("/mother-admin");
         else {
           toast.error("You do not have permission to access this page!");
           navigate("/restricted");
@@ -77,8 +81,7 @@ const MotherAdminLogin = () => {
     <div
       className="min-h-screen flex justify-center items-center bg-cover bg-center relative"
       style={{
-        backgroundImage:
-          "url('https://i.ibb.co.com/bMktQGPC/wp2793078.jpg')",
+        backgroundImage: "url('https://i.ibb.co.com/bMktQGPC/wp2793078.jpg')",
       }}
     >
       {/* Dark Overlay */}
@@ -88,17 +91,14 @@ const MotherAdminLogin = () => {
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-20 p-10 rounded-lg w-[90%] max-w-md">
         {/* Logo */}
         {adminImage && (
-          <img
-            src={adminImage}
-            alt="Logo"
-            className="w-40 mb-4"
-          />
+          <img src={adminImage} alt="Logo" className="w-40 mb-4" />
         )}
 
         {/* Form */}
         <div className="w-full border-l-2 border-white pl-6">
           <h2 className="text-center text-white text-2xl font-bold mb-6">
-          Mother  Admin <span className="text-gray-300 font-normal">Sign in</span>
+            Mother Admin{" "}
+            <span className="text-gray-300 font-normal">Sign in</span>
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
